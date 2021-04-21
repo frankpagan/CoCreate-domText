@@ -1,130 +1,15 @@
+/*global DOMParser*/
 // tag name & attribute names are case-insensetive
+//todo
+//todo-imp
+//tofo
 
 
+// dev
+// todo-imp: remove
+const HTMLParser = require('node-html-parser');
 
-// domHtmlManipulator.prototype.getPosAction =
-//   function getPosAction(elPos, pos, changeStr, hasChild, childPos) {
-//     if (pos > elPos.tagStPos && pos < elPos.tagStClAfPos) {
-//       return 1;
-//     }
-//     else if (pos > elPos.tagStClAfPos && pos < elPos.tagEnPos) {
-//       if (childPos) {
-//         return {
-//           action: 'innerText',
-//           pos: this.minusEl(pos, childPos),
-//           changeStr
-//         }
-//       }
-//       else
-//         return {
-//           action: 'innerText',
-//           pos,
-//           changeStr
-//         }
-//     }
-//     else {
-//       return { pos, ...elPos };
-
-//     }
-
-//   }
-
-
-// domHtmlManipulator.prototype.minusEl =
-//   function minusEl(pos, el) {
-
-//     return pos - el.tagEnd - el.tagStart;
-
-//   }
-
-
-
-// domHtmlManipulator.prototype.findElByPos = function findElByPos({ pos, action, changeStr, removeLength }) {
-//   if(pos < 0 || pos > this.html.length)
-//     throw new Error('position is out of range');
-
-//   this.changeStr = changeStr;
-//   this.removeLength = removeLength;
-//   this.pos = pos;
-//   this.action = action;
-//   let iof1pos, iof2pos;
-//   let pos1 = pos - idSearch.length,
-//     pos2 = pos + idSearch.length;
-//   let leftList = [],
-//     rightList = [];
-// // obsolete: increase pos1 and pos2 if it's out of range of html
-//   // if(pos1 > this.html.length)
-//   // {
-//   //   pos1 = this.html.length;
-//   // }
-
-//   // if(pos2 < 0)
-//   // {
-//   //   pos2 = 0;
-//   // }
-
-//   while (true) {
-//     //  a mechanism to break the loop
-//     if(pos1 === -1 && pos2 === -1)
-//       break;
-
-
-//     // searching minus the idSearch.length as it could match in loop
-//     if (pos1 !== -1 )
-//       pos1 = this.html.indexOf(idSearch, pos1 +  idSearch.length);
-//     if (pos2 !== -1)
-//       pos2 = this.html.lastIndexOf(idSearch, pos2 - idSearch.length);
-
-//     if (pos1 !== -1)
-//       iof1pos = this.dumpPositions(pos1);
-
-
-//     if (pos2 !== -1)
-//       iof2pos = this.dumpPositions(pos2);
-//   // console.log(iof1pos, iof2pos);
-//   // return;
-
-//     // todo: rightlist leftlist should be inside iof2pos = this.dumpPositions(pos2); if
-//     rightList.push(iof1pos)
-//     leftList.push(iof2pos)
-//     if (iof1pos && iof1pos.tagStart < pos && iof1pos.tagEnd > pos) {
-//       if (iof2pos && iof2pos.tagStart < pos && iof2pos.tagEnd > pos) {
-//         if (iof1pos.length < iof2pos.length) {
-
-//           return this.reduceToCommand(iof1pos, leftList);    
-//         }
-//         else {
-//           return this.reduceToCommand(iof2pos, leftList);  
-//         }
-//       }
-//       else {
-//         return this.reduceToCommand(iof1pos, leftList);  
-//       }
-
-//     }
-//     else {
-//       if (iof2pos && iof2pos.tagStart < pos && iof2pos.tagEnd > pos) {
-//         return this.reduceToCommand(iof2pos, leftList);    
-//       }
-//       else {
-//         continue;
-//       }
-
-//     }
-
-//   }
-
-
-//   // todo: after break, the text is added to end or begining of the html (we can't handle elements without id)
-//   // 
-
-
-
-// }
-
-
-
-
+// dev
 
 String.prototype.replaceAt = function(index, replacement) {
   return this.substr(0, index) + replacement + this.substr(index);
@@ -162,10 +47,14 @@ let sty = getRegStyle(allStyleName);
 let cls = getRegClass(allClassName);
 let mcls = `${cls}*?`;
 // todo: check with a tag like <a />
-function domHtmlManipulator(html) {
+
+const idSearch = 'data-element_id=';
+
+function domHtmlManipulator(html, domHtml) {
 
 
   this.html = html;
+  this.domHtml = domHtml;
   this.param = {}
   // this.id = [];
   this.offset = [];
@@ -189,12 +78,13 @@ function domHtmlManipulator(html) {
 }
 
 
-domHtmlManipulator.prototype.findStartTag = function findStartTag() {
+domHtmlManipulator.prototype.findStartTagById = function findStartTagById() {
   let sch = `(?:${sps}data-element_id\=\"${this.param.target}\"${sps})`;
   let reg = `(?<tagWhole>${tgs}${at}*?${sch}${at}*?${the})`;
   let tagStart = this.html.match(new RegExp(reg, "is"));
 
   if (!tagStart) throw new Error("findPosition: element can not be found. id:" + this.param.target);
+  this.target = this.param.target;
   this.tagName = tagStart.groups.tagName.toUpperCase();
   if (tagStart && this.param.tagName && this.tagName !== this.param.tagName)
     throw new Error(
@@ -221,7 +111,7 @@ domHtmlManipulator.prototype.findStartTag = function findStartTag() {
 };
 
 domHtmlManipulator.prototype.getWholeElement = function getWholeElement() {
-  if (!this.tagStPos) this.findStartTag();
+  if (!this.tagStPos) this.findStartTagById();
   if (!this.tagEnPos) this.findClosingTag();
 
   return { from: this.tagStPos, to: this.tagEnClAfPos };
@@ -261,7 +151,7 @@ domHtmlManipulator.prototype.findClosingTag = function findClosingTag() {
 
 domHtmlManipulator.prototype.getInsertAdjacentElement =
   function getInsertAdjacentElement() {
-    if (!this.tagStPos) this.findStartTag();
+    if (!this.tagStPos) this.findStartTagById();
     switch (this.param.property) {
       case "beforebegin":
         return { from: this.tagStPos };
@@ -354,7 +244,7 @@ domHtmlManipulator.prototype.findStylePos = function findStylePos() {
 domHtmlManipulator.prototype.findAttribute =
   function findAttribute(property, isValueOnly) {
 
-    if (!this.tagStAfPos) this.findStartTag();
+    if (!this.tagStAfPos) this.findStartTagById();
 
     let prRegAttr = getRegAttribute(property);
     let regex = `^(?<beforeAtt>${at}*?)${prRegAttr}`;
@@ -389,7 +279,7 @@ domHtmlManipulator.prototype.getSetAttribute = function getSetAttribute(type) {
 
 
 domHtmlManipulator.prototype.getInnerText = function getInnerText() {
-  if (!this.tagStPos) this.findStartTag();
+  if (!this.tagStPos) this.findStartTagById();
   this.findClosingTag();
 
   return { from: this.tagStClAfPos, to: this.tagEnPos };
@@ -493,7 +383,7 @@ domHtmlManipulator.prototype.dumpPositions = function dumpPositions(pos) {
 
   let id = this.scratchId(pos + idSearch.length);
   this.setParam({ target: id });
-  this.findStartTag();
+  this.findStartTagById();
   this.findClosingTag();
   let tagStart = this.tagStPos;
   let tagEnd = this.tagEnClAfPos || this.tagStClAfPos;
@@ -519,26 +409,30 @@ domHtmlManipulator.prototype.dumpPositions = function dumpPositions(pos) {
 
 }
 
-const idSearch = 'data-element_id=';
+
 domHtmlManipulator.prototype.getId = function getId(pos) {
   let attWrapper = this.html[pos];
   let endWrapper = this.html.indexOf(attWrapper, pos + 1)
   return this.html.substring(pos + 1, endWrapper);
 }
 
-domHtmlManipulator.prototype.findEl = function findEl(pos, pathArray){
-        this.param.target = this.getId(pos + idSearch.length);
-        this.findStartTag();
-        this.findClosingTag()
-        // pathArray.push(Object.assign({}, this))
-        
-        if (this.pos > this.tagStPos && this.pos < this.tagStClAfPos) {
-          return true
-        }
-        
-        if (this.pos >= this.tagStClAfPos && this.pos <= this.tagEnClAfPos) {
-          return true;
-        }
+domHtmlManipulator.prototype.isPosOnEl = function isPosOnEl(elementIdPos, pathArray) {
+  this.param.target = this.getId(elementIdPos + idSearch.length);
+  this.findStartTagById();
+  this.findClosingTag();
+  // pathArray.push(Object.assign({}, this))
+
+  let tagStartPos = this.tagStPos;
+  let tagEndPos = this.tagEnClAfPos || this.tagStClAfPos;
+
+  if (this.pos > tagStartPos && this.pos <= tagEndPos) {
+    return true
+  }
+
+  // tofo: test performance efficiency more variable or more logic
+  // if (this.pos >= this.tagStClAfPos && this.pos <= this.tagEnClAfPos) {
+  //   return true;
+  // }
 }
 
 
@@ -547,6 +441,10 @@ domHtmlManipulator.prototype.findElByPos = function findElByPos({ pos, action, c
   if (pos < 0 || pos > this.html.length)
     throw new Error('position is out of range');
 
+
+  let htmlEl = HTMLParser.parse(changeStr);
+  if (htmlEl.childNodes.some(el => el.constructor.name === "HTMLElement"))
+    this.changeStrHtml = htmlEl;
   this.changeStr = changeStr;
   this.removeLength = removeLength;
   this.pos = pos;
@@ -558,30 +456,30 @@ domHtmlManipulator.prototype.findElByPos = function findElByPos({ pos, action, c
   this.rightList = [];
 
   while (true) {
-  
-      // todo: might create bugs do we check if which instance has less length
-      // console.log(pos1 + idSearch.length)
-      pos1 = this.html.indexOf(idSearch, pos1 + idSearch.length);
-      if (pos1 !== -1 &&   this.findEl(pos1, this.rightList)) {
 
-       return this.reduceToCommand();
-       
-      }
+    // todo: might create bugs do we check if which instance has less length
+    // console.log(pos1 + idSearch.length)
+    pos1 = this.html.indexOf(idSearch, pos1 + idSearch.length);
+    if (pos1 !== -1 && this.isPosOnEl(pos1)) {
+
+      return this.reduceToCommand();
+
+    }
 
 
-    
-    
 
-  
-      pos2 = this.html.lastIndexOf(idSearch, pos2 - idSearch.length);
 
-      if (pos2 !== -1 && this.findEl(pos2,this.leftList) ) {
-        
-         return this.reduceToCommand();
-       
-      }
 
-  
+
+    pos2 = this.html.lastIndexOf(idSearch, pos2 - idSearch.length);
+
+    if (pos2 !== -1 && this.isPosOnEl(pos2)) {
+
+      return this.reduceToCommand();
+
+    }
+
+
 
     if (pos1 === -1 && pos2 === -1)
       return 'not found'
@@ -597,7 +495,7 @@ domHtmlManipulator.prototype.findElByPos = function findElByPos({ pos, action, c
 
 
 
-domHtmlManipulator.prototype.renameTag = function renameTag( isStarting) {
+domHtmlManipulator.prototype.renameTag = function renameTag(isStarting) {
 
   // console.log('aaaaa',this.tagName , this.tagClosingTagName)
   let newValue, tagName = isStarting ? this.tagName : this.tagClosingTagName;
@@ -719,7 +617,7 @@ domHtmlManipulator.prototype.renameAttribute = function renameAttribute() {
     else {
       // attribute breaking change
 
-      this.rescan();
+      this.rescan('attribute');
       break;
     }
 
@@ -731,10 +629,10 @@ domHtmlManipulator.prototype.renameAttribute = function renameAttribute() {
   // find attribute
 
 }
-domHtmlManipulator.prototype.renameNode = function renameNode( leftList) {
+domHtmlManipulator.prototype.renameNode = function renameNode(leftList) {
 
   // start of iof
-  let pos = this.pos - this.tagStClAfPos;
+  let strIndex = this.pos - this.tagStClAfPos;
 
   // last element is always iof should be removed
   leftList.reverse().shift();
@@ -742,44 +640,45 @@ domHtmlManipulator.prototype.renameNode = function renameNode( leftList) {
   // console.log('azzzz', leftList.length)
   // console.log('azz', leftList)
 
+  // finding index of TextNode and at which position of TextNode the change happened
   if (leftList.length) {
 
     // elements length
     for (let i = 0; i < leftList.length; i++) {
-      pos -= leftList[i].length;
+      strIndex -= leftList[i].length;
     }
 
     // first nodeTExt length
-    pos -= leftList[0].tagStPos - this.tagStClAfPos;
+    strIndex -= leftList[0].tagStPos - this.tagStClAfPos;
     // rest of the nodeTexts length
     for (let i = 1; i < leftList.length; i++) {
       // console.log('azz', i)
-      pos -= leftList[i].tagStPos - leftList[i - 1].tagEnClAfPos;
+      strIndex -= leftList[i].tagStPos - leftList[i - 1].tagEnClAfPos;
     }
   }
+  let nodeIndex = leftList.length;
+
+  let el = this.domHtml.querySelector(`[data-element_id="${this.target}"]`);
+  let textNode = el.childNodes[nodeIndex];
+
+
   if (this.action === "add") {
-    this.html = this.html.replaceAt(this.pos, this.changeStr)
-    return {
-      command: 'renameNode',
-      nodeIndex: leftList.length,
-      strIndex: pos,
-      value: this.changeStr,
-      // iof
-    };
+
+    this.html = this.html.replaceAt(this.pos, this.changeStr);
+    // todo-imp: s&replace rawText to data in browser
+    textNode.rawText = textNode.rawText.substr(0, strIndex) + this.changeStr + textNode.rawText.substr(strIndex);
+    return el.outerHTML;
 
   }
   else if (this.action === "remove") {
 
     this.html = this.html.removeAt(this.pos - this.removeLength, this.pos)
+    textNode.rawText = textNode.rawText.substr(0, strIndex - this.removeLength) + textNode.rawText.substr(strIndex);
+    return el.outerHTML;
 
-    return {
-      command: 'renameNode',
-      nodeIndex: leftList.length,
-      strIndex: pos,
-      removeLength: this.removeLength,
-      // iof
-    };
   }
+  
+      // if (this.changeStrHtml)
   //   return this.pos;
 
 }
@@ -805,24 +704,20 @@ domHtmlManipulator.prototype.parseAllNode = function parseAllNode(str) {
   else return doc.body.childNodes;
 }
 
-domHtmlManipulator.prototype.rescan = function rescan(iof) {
-  // console.trace('11111111111')
-  // console.log('lllllllllllll')
-  // console.log(iof)
+// rescan: parse newly edited html as it might have added something significant if the old html didn't make sense
+domHtmlManipulator.prototype.rescan = function rescan(type) {
 
 
 
   if (this.action === "add") {
-
     this.html = this.html.replaceAt(this.pos, this.changeStr)
   }
   else if (this.action === "remove") {
     this.html = this.html.removeAt(this.pos - this.removeLength, this.pos)
-
   }
 
-  this.setParam({ target: iof.id })
-  this.findStartTag();
+  this.setParam({ target: this.target })
+  this.findStartTagById();
 
 
 
@@ -830,11 +725,15 @@ domHtmlManipulator.prototype.rescan = function rescan(iof) {
   let attStartPos = this.tagStAfPos + this.tagName.length;
   let attStr = this.html
     .substring(attStartPos, this.tagStClPos);
-  attStr = attStr.slice(0, -1);
+    
+  // attStr = attStr.slice(0, -1);
+  
   console.log('rescan', attStr)
   // if(this.tagName === element.tagName)
+  
+  
   for (let match of attStr.matchAll(anyAtt1)) {
-    // console.log(match);
+    console.log(match);
     // check all attribute
 
 
@@ -851,36 +750,29 @@ let spaceEnd = `(?<spaceEnd>${sps})`;
 let attValue = `(?:(?:="(?<attValue>[^"]*?)")|${spa})`
 let anyAtt1 = new RegExp(`${spaceBegin}(?<att>(?<attName>[a-z0-9\-\_]+)(${attValue})?)${spaceEnd}`, 'gis');
 domHtmlManipulator.prototype.reduceToCommand = function reduceToCommand() {
-  console.log('>>>>>>>', this.param.target)
-  return;
+  // console.log('>>>>>>>', this.param.target)
+  // return;
 
   if (this.pos >= this.tagStAfPos && this.pos <= this.tagNameEnd) {
-    return this.renameTag( true);
+    return this.renameTag(true);
   }
   else if (this.pos >= this.tagClosingNameStart && this.pos <= this.tagClosingNameEnd) {
     return this.renameTag();
   }
   else if (this.pos > this.tagNameEnd && this.pos < this.tagStClAfPos) {
-
-
     return this.renameAttribute();
   }
   else if (this.pos >= this.tagStClAfPos && this.pos <= this.tagEnPos) {
-    return this.renameNode(this.leftList);
+      return this.renameNode(this.leftList);
   }
   else {
-
-    return this.rescan( this.leftList);
+    return this.rescan(this.leftList, 'all');
   }
 
 }
 
 
 module.exports = domHtmlManipulator;
-
-// const { JSDOM } = require("jsdom");
-// const { window: { document: { body } } } = new JSDOM(html);
-
 
 
 
