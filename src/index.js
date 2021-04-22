@@ -7,7 +7,7 @@
 
 // dev
 // todo-imp: remove
-const HTMLParser = require('node-html-parser');
+
 
 // dev
 
@@ -435,20 +435,233 @@ domHtmlManipulator.prototype.isPosOnEl = function isPosOnEl(elementIdPos, pathAr
   // }
 }
 
+domHtmlManipulator.prototype.parseElement = function parseAllNode(str) {
+  let doc = new DOMParser().parseFromString(str, "text/html");
+  if (doc.head.children.length) return doc.head.children[0];
+  else return doc.body.children[0];
+}
+
+// domHtmlManipulator.prototype.addChange = function addChange({ pos, action, changeStr }) {
+// }
 
 
-domHtmlManipulator.prototype.findElByPos = function findElByPos({ pos, action, changeStr, removeLength }) {
+// domHtmlManipulator.prototype.removeChange = function removeChange({ pos, action, removeLength }) {
+// }
+
+// domHtmlManipulator.prototype.getAttributeContext = function getAttributeContext() {
+//   let attStartPos = this.tagStAfPos + this.tagName.length;
+//   let attStr = this.html
+//     .substring(attStartPos, this.tagStClPos);
+
+//   for (let match of attStr.matchAll(anyAtt1)) {
+
+//     let attNameStart = attStartPos + match.index + match.groups.spaceBegin.length;
+//     let attNameEnd = attNameStart + match.groups.attName.length;
+//     let attValueStart = attNameEnd + 2;
+//     let attValueEnd = attValueStart + match.groups.attValue.length;
+
+//     if (this.pos >= attNameStart && this.pos <= attNameEnd) 
+//       return 'attributeName'
+//     else if (this.pos >= attValueStart && this.pos <= attValueEnd)
+//       return 'attributeValue'
+//     else 
+//       return false;
+//   }
+
+// }
+
+domHtmlManipulator.prototype.getAttributeContext = function getAttributeContext(start, end) {
+  let attStartPos = this.tagStAfPos + this.tagName.length;
+  let attStr = this.html
+    .substring(attStartPos, this.tagStClPos);
+
+  for (let match of attStr.matchAll(anyAtt1)) {
+
+    let attNameStart = attStartPos + match.index + match.groups.spaceBegin.length;
+    let attNameEnd = attNameStart + match.groups.attName.length;
+    let attValueStart = attNameEnd + 2;
+    let attValueEnd = attValueStart + match.groups.attValue.length;
+
+
+    if (start >= attNameStart && start <= attNameEnd && end >= attNameStart && end <= attNameEnd)
+      return 'attributeName'
+    else if (start >= attValueStart && start <= attValueEnd && end >= attValueStart && end <= attValueEnd)
+      return 'attributeValue'
+
+
+  }
+  return false;
+}
+
+domHtmlManipulator.prototype.getContext = function getContext(start, end) {
+  if( small > smallRange && small < largRange || ... || small < smallRange && big > largeRange)
+
+  if(start > end)
+    ([end,start] = [start,end])
+  
+
+  // todo: make getContext accept a range
+  if (end > this.tagStPos && start <= this.tagStPos)
+    return false;
+  else if (end > this.tagStClAfPos && start < this.tagStClAfPos)
+    return false;
+  // else if(end > this.tagEnPos && start <= this.tagEnPos || end > this.tagClosingNameStart && start <= this.tagClosingNameStart)
+  // else if (start > this.tagEnPos && start <= this.tagClosingNameStart || end > this.tagEnPos && end <= this.tagClosingNameStart)
+  else if (start > this.tagEnPos && start <= this.tagClosingNameStart || end > this.tagEnPos && end <= this.tagClosingNameStart)
+    return false;
+  else if (end > this.tagEnClAfPos && start <= this.tagEnClAfPos)
+    return false;
+  // else if(this.tagNameEnd < start  && this.tagStClAfPos  > start || end > this.tagNameEnd && end < this.tagStClAfPos)
+  else if (start > this.tagNameEnd && start < this.tagStClPos || end > this.tagNameEnd && end < this.tagStClPos) {
+    return this.getAttributeContext(start, end)
+  }
+
+  else
+    return true;
+
+
+  // if (pos >= this.tagStAfPos && pos <= this.tagNameEnd) {
+  //   return 'firstTag'
+  // }
+  // else if (pos >= this.tagClosingNameStart && pos <= this.tagClosingNameEnd) {
+  //   return 'endTag'
+  // }
+  // else if (pos >= this.tagStClAfPos && pos <= this.tagEnPos) {
+  //   return 'innerContent'
+  // }
+  // else if (pos > this.tagNameEnd && pos < this.tagStClAfPos) {
+  //   return this.getAttributeContext()
+  // }
+  // else {
+  //   return false;
+  // }
+
+}
+
+
+
+domHtmlManipulator.prototype.changeDom = function changeDom({ pos, action, changeStr, removeLength }) {
   if (pos < 0 || pos > this.html.length)
     throw new Error('position is out of range');
 
 
-  let htmlEl = HTMLParser.parse(changeStr);
-  if (htmlEl.childNodes.some(el => el.constructor.name === "HTMLElement"))
-    this.changeStrHtml = htmlEl;
+
+
   this.changeStr = changeStr;
   this.removeLength = removeLength;
   this.pos = pos;
   this.action = action;
+
+  if (!this.findElByPos(pos))
+    throw new Error("change doesn't represent in a new element");
+
+  let newChangeInEl;
+
+  if (changeStr) {
+
+
+
+    this.newHtml = this.html.replaceAt(this.pos, this.changeStr)
+    newChangeInEl = this.newHtml.substring(this.tagStPos, this.tagEnClAfPos + this.changeStr.length)
+
+  }
+  else {
+    this.newHtml = this.html.removeAt(this.pos - this.removeLength, this.pos)
+    newChangeInEl = this.newHtml.substring(this.tagStPos, this.tagEnClAfPos - this.removeLength)
+    //todo: get context only for removeLength
+  }
+  let r;
+  for (let i = 0; i <= 80; i++) {
+    r = this.getContext(pos - i - removeLength, pos - i)
+    console.log('>>', pos - i - removeLength, r, this.html.substring(pos - i - removeLength, pos - i))
+  }
+
+  // do parse all and check if more than one element insertAdjacent Them after realDomTarget
+  let editorEl = this.parseElement(newChangeInEl);
+
+
+  let realDomTarget = this.domHtml.querySelector(`[data-element_id="${this.target}"]`);
+  if (!realDomTarget)
+    console.error('target not found on real dom');
+
+
+  this.rebuildDom(editorEl, realDomTarget)
+
+
+
+  // let secondPoint;
+  // if (changeStr) {
+  //   secondPoint = pos + changeStr.length;
+  //   if (secondPoint <= this.tagStPos && secondPoint >= this.tagEnClAfPos)
+  //     this.findElByPos(secondPoint);
+
+  // }
+  // else {
+  //   secondPoint = pos + removeLength;
+  //   if (secondPoint <= this.tagStPos && secondPoint >= this.tagEnClAfPos)
+  //     this.findElByPos(secondPoint);
+
+  // }
+
+
+}
+
+domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
+
+  if (leftEl.tagName !== rightEl.tagName) {
+    this.renameTagName(leftEl, rightEl)
+    // rename rightEl.tagname
+  }
+  this.overwriteAttributes(leftEl, rightEl);
+
+  const rightElChilds = rightEl.childNodes
+
+  for (let [index, leftChild] of Array.from(leftEl.childNodes).entries()) {
+    if (leftChild.constructor.name === 'Text') {
+      // todo: parse html if there is any inside leftChild.data and arrange inside rightEl
+      if (rightElChilds[index].constructor.name === 'Text' && leftChild.data !== rightElChilds[index].data)
+        rightElChilds[index].data = leftChild.data;
+      else
+        rightElChilds[index] = document.createTextNode(leftChild.data);
+    }
+    else {
+      rebuildDom(leftChild, rightElChilds[index])
+    }
+
+  }
+
+
+
+}
+
+domHtmlManipulator.prototype.renameTagName = function renameTagName(leftEl, rightEl) {
+
+  document.createElement(leftEl.tagName);
+  this.overwriteAttributes(leftEl.tagName)
+}
+
+
+domHtmlManipulator.prototype.overwriteAttributes = function overwriteAttributes(leftEl, rightEl) {
+  // todo: consider https://developer.mozilla.org/en-US/docs/Web/API/Attr/namespaceURI
+  for (let leftAtt of leftEl.attributes) {
+    if (!rightEl.attributes[leftAtt.name] || rightEl.attributes[leftAtt.name].value !== leftAtt.value)
+      rightEl.setAttribute(leftAtt.name, leftAtt.value)
+  }
+
+  if (leftEl.attributes.length !== rightEl.attributes.length) {
+    for (let rightAtt of rightEl.attributes) {
+      if (!leftEl.attributes[rightAtt.name])
+        rightEl.removeAttribute(rightAtt.name)
+    }
+
+  }
+}
+
+
+
+
+domHtmlManipulator.prototype.findElByPos = function findElByPos(pos) {
+
   // console.log(this.html.length, pos)
   let pos1 = pos - idSearch.length;
   let pos2 = pos + idSearch.length;
@@ -460,29 +673,19 @@ domHtmlManipulator.prototype.findElByPos = function findElByPos({ pos, action, c
     // todo: might create bugs do we check if which instance has less length
     // console.log(pos1 + idSearch.length)
     pos1 = this.html.indexOf(idSearch, pos1 + idSearch.length);
-    if (pos1 !== -1 && this.isPosOnEl(pos1)) {
+    if (pos1 !== -1 && this.isPosOnEl(pos1))
+      return true;
 
-      return this.reduceToCommand();
-
-    }
-
-
-
-
-
+    // return this.reduceToCommand();
 
     pos2 = this.html.lastIndexOf(idSearch, pos2 - idSearch.length);
 
-    if (pos2 !== -1 && this.isPosOnEl(pos2)) {
-
-      return this.reduceToCommand();
-
-    }
-
+    if (pos2 !== -1 && this.isPosOnEl(pos2))
+      return true;
 
 
     if (pos1 === -1 && pos2 === -1)
-      return 'not found'
+      return false;
 
 
   }
@@ -491,9 +694,6 @@ domHtmlManipulator.prototype.findElByPos = function findElByPos({ pos, action, c
 
 
 }
-
-
-
 
 domHtmlManipulator.prototype.renameTag = function renameTag(isStarting) {
 
@@ -532,9 +732,6 @@ domHtmlManipulator.prototype.renameTag = function renameTag(isStarting) {
 
 
 }
-
-
-
 domHtmlManipulator.prototype.renameAttribute = function renameAttribute() {
   let attStartPos = this.tagStAfPos + this.tagName.length;
   let attStr = this.html
@@ -677,33 +874,21 @@ domHtmlManipulator.prototype.renameNode = function renameNode(leftList) {
     return el.outerHTML;
 
   }
-  
-      // if (this.changeStrHtml)
+
+  // if (this.changeStrHtml)
   //   return this.pos;
 
 }
 
 
-domHtmlManipulator.prototype.manageNode = function manageNode({
-  command,
-  nodeIndex,
-  strIndex,
-  value,
-  iof
-}) {
-  let el = body.querySelector(`[data-element_id="t3"]`);
 
-  // let parsedChange = this.
-  console.log(iof.id, el.outerHTML, Array.from(el.children).length)
 
-}
 
 domHtmlManipulator.prototype.parseAllNode = function parseAllNode(str) {
   let doc = new DOMParser().parseFromString(str, "text/html");
   if (doc.head.childNodes.length) return doc.head.childNodes;
   else return doc.body.childNodes;
 }
-
 // rescan: parse newly edited html as it might have added something significant if the old html didn't make sense
 domHtmlManipulator.prototype.rescan = function rescan(type) {
 
@@ -725,13 +910,13 @@ domHtmlManipulator.prototype.rescan = function rescan(type) {
   let attStartPos = this.tagStAfPos + this.tagName.length;
   let attStr = this.html
     .substring(attStartPos, this.tagStClPos);
-    
+
   // attStr = attStr.slice(0, -1);
-  
+
   console.log('rescan', attStr)
   // if(this.tagName === element.tagName)
-  
-  
+
+
   for (let match of attStr.matchAll(anyAtt1)) {
     console.log(match);
     // check all attribute
@@ -763,7 +948,7 @@ domHtmlManipulator.prototype.reduceToCommand = function reduceToCommand() {
     return this.renameAttribute();
   }
   else if (this.pos >= this.tagStClAfPos && this.pos <= this.tagEnPos) {
-      return this.renameNode(this.leftList);
+    return this.renameNode(this.leftList);
   }
   else {
     return this.rescan(this.leftList, 'all');
@@ -772,7 +957,7 @@ domHtmlManipulator.prototype.reduceToCommand = function reduceToCommand() {
 }
 
 
-module.exports = domHtmlManipulator;
+export default domHtmlManipulator;
 
 
 
