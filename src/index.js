@@ -79,11 +79,20 @@ function domHtmlManipulator(html, domHtml) {
 
 
 domHtmlManipulator.prototype.findStartTagById = function findStartTagById() {
+
+
+
+
   let sch = `(?:${sps}data-element_id\=\"${this.param.target}\"${sps})`;
   let reg = `(?<tagWhole>${tgs}${at}*?${sch}${at}*?${the})`;
   let tagStart = this.html.match(new RegExp(reg, "is"));
 
-  if (!tagStart) throw new Error("findPosition: element can not be found. id:" + this.param.target);
+  if (!tagStart)
+    if (this.html.indexOf(idSearch + `"${this.param.target}"`) === -1)
+      throw new Error("findPosition: element can not be found. id:" + this.param.target);
+    else
+      throw new Error("findPosition: element could be found but can not parse the element. id:" + this.param.target);
+
   this.target = this.param.target;
   this.tagName = tagStart.groups.tagName.toUpperCase();
   if (tagStart && this.param.tagName && this.tagName !== this.param.tagName)
@@ -425,7 +434,7 @@ domHtmlManipulator.prototype.isPosOnEl = function isPosOnEl(elementIdPos, pathAr
   let tagStartPos = this.tagStPos;
   let tagEndPos = this.tagEnClAfPos || this.tagStClAfPos;
 
-  if (this.pos > tagStartPos && this.pos <= tagEndPos) {
+  if (this.pos > tagStartPos && this.pos < tagEndPos) {
     return true
   }
 
@@ -435,10 +444,24 @@ domHtmlManipulator.prototype.isPosOnEl = function isPosOnEl(elementIdPos, pathAr
   // }
 }
 
-domHtmlManipulator.prototype.parseElement = function parseAllNode(str) {
+domHtmlManipulator.prototype.parseAll = function parseAll(str) {
+  let mainTag = str.match(/\<(?<tag>[a-z0-9]+)(.*?)?\>/).groups.tag;
+  if (!mainTag)
+    console.error('find position: can not find the main tag');
   let doc = new DOMParser().parseFromString(str, "text/html");
-  if (doc.head.children.length) return doc.head.children[0];
-  else return doc.body.children[0];
+  switch (mainTag) {
+    case 'html':
+      return [doc.body.parentElement];
+    case 'body':
+      return [doc.body];
+    case 'head':
+      return [doc.head];
+
+    default:
+      if (doc.head.children.length) return doc.head.children;
+      else return doc.body.children;
+  }
+
 }
 
 // domHtmlManipulator.prototype.addChange = function addChange({ pos, action, changeStr }) {
@@ -480,7 +503,7 @@ domHtmlManipulator.prototype.getAttributeContext = function getAttributeContext(
     let attNameStart = attStartPos + match.index + match.groups.spaceBegin.length;
     let attNameEnd = attNameStart + match.groups.attName.length;
     let attValueStart = attNameEnd + 2;
-    let attValueEnd = attValueStart + match.groups.attValue.length;
+    let attValueEnd = attValueStart + match.groups.attValue ? match.groups.attValue.length : 0;
 
 
     if (start >= attNameStart && start <= attNameEnd && end >= attNameStart && end <= attNameEnd)
@@ -493,12 +516,17 @@ domHtmlManipulator.prototype.getAttributeContext = function getAttributeContext(
   return false;
 }
 
+function rangeOverlap(range1a, range1b, range2a, range2b) {
+  return
+}
 domHtmlManipulator.prototype.getContext = function getContext(start, end) {
-  if( small > smallRange && small < largRange || ... || small < smallRange && big > largeRange)
+  // if( small > smallRange && small < largRange || ... || small < smallRange && big > largeRange)
+  // if( (small > smallRange && small < largRange) || (big > smallrange && big < largeRange) || small < smallRange || big > largeRange)
+  // if( (start > this.tagEnPos && start < this.tagClosingNameStart) || (end > this.tagEnPos && end < this.tagClosingNameStart) || start < this.tagEnPos || end > this.tagClosingNameStart)
 
-  if(start > end)
-    ([end,start] = [start,end])
-  
+  if (start > end)
+    ([end, start] = [start, end])
+
 
   // todo: make getContext accept a range
   if (end > this.tagStPos && start <= this.tagStPos)
@@ -507,9 +535,9 @@ domHtmlManipulator.prototype.getContext = function getContext(start, end) {
     return false;
   // else if(end > this.tagEnPos && start <= this.tagEnPos || end > this.tagClosingNameStart && start <= this.tagClosingNameStart)
   // else if (start > this.tagEnPos && start <= this.tagClosingNameStart || end > this.tagEnPos && end <= this.tagClosingNameStart)
-  else if (start > this.tagEnPos && start <= this.tagClosingNameStart || end > this.tagEnPos && end <= this.tagClosingNameStart)
+  else if ((start >= this.tagEnPos && start < this.tagClosingNameStart) || (end > this.tagEnPos && end < this.tagClosingNameStart) || (start <= this.tagEnPos && end > this.tagClosingNameStart))
     return false;
-  else if (end > this.tagEnClAfPos && start <= this.tagEnClAfPos)
+  else if (end >= this.tagEnClAfPos && start <= this.tagEnClAfPos)
     return false;
   // else if(this.tagNameEnd < start  && this.tagStClAfPos  > start || end > this.tagNameEnd && end < this.tagStClAfPos)
   else if (start > this.tagNameEnd && start < this.tagStClPos || end > this.tagNameEnd && end < this.tagStClPos) {
@@ -540,51 +568,73 @@ domHtmlManipulator.prototype.getContext = function getContext(start, end) {
 
 
 
-domHtmlManipulator.prototype.changeDom = function changeDom({ pos, action, changeStr, removeLength }) {
+domHtmlManipulator.prototype.changeDom = function changeDom({ pos, action, changeStr, removeLength, html }) {
   if (pos < 0 || pos > this.html.length)
     throw new Error('position is out of range');
 
 
-
+  // todo: remove should check old html and add should check new if it's attribute always new
 
   this.changeStr = changeStr;
   this.removeLength = removeLength;
   this.pos = pos;
   this.action = action;
+  if (changeStr)
+    this.html = html;
+  try {
+    if (!this.findElByPos(pos))
+      return console.error("change doesn't represent in a new element ")
+    // todo: or element can not be found (findElById should support if id exist and it can not found or not exist at all)
+    // todo: parse at and directly do insertAdjacent (findElByPos should support off element)
+  }
+  catch (err) {
+    return console.error("element can not be found")
+    // throw new Error("change doesn't represent in a new element ");
 
-  if (!this.findElByPos(pos))
-    throw new Error("change doesn't represent in a new element");
+  }
 
-  let newChangeInEl;
+  if (removeLength)
+    this.html = html;
+  let newChangeInEl, context;
 
   if (changeStr) {
 
-
-
-    this.newHtml = this.html.replaceAt(this.pos, this.changeStr)
-    newChangeInEl = this.newHtml.substring(this.tagStPos, this.tagEnClAfPos + this.changeStr.length)
-
+    // this.newHtml = this.html.replaceAt(this.pos, this.changeStr)
+    newChangeInEl = this.html.substring(this.tagStPos, this.tagEnClAfPos)
+    // context = this.getContext(pos, 1)
   }
   else {
-    this.newHtml = this.html.removeAt(this.pos - this.removeLength, this.pos)
-    newChangeInEl = this.newHtml.substring(this.tagStPos, this.tagEnClAfPos - this.removeLength)
-    //todo: get context only for removeLength
+    // this.newHtml = this.html.removeAt(this.pos - this.removeLength, this.pos)
+    // todo: rempveLength investigate
+    newChangeInEl = this.html.substring(this.tagStPos, this.tagEnClAfPos)
+
+    context = this.getContext(pos - removeLength, pos);
+    if (!context)
+      return console.error('breaking change no dom change')
   }
-  let r;
-  for (let i = 0; i <= 80; i++) {
-    r = this.getContext(pos - i - removeLength, pos - i)
-    console.log('>>', pos - i - removeLength, r, this.html.substring(pos - i - removeLength, pos - i))
-  }
+  // let r;
+  // for (let i = 0; i <= 80; i++) {
+  //   r = this.getContext(pos - i - removeLength + 1, pos - i)
+  //   console.log('>>', pos - i - removeLength, r, this.html.substring(pos - i - removeLength, pos - i))
+  // }
 
   // do parse all and check if more than one element insertAdjacent Them after realDomTarget
-  let editorEl = this.parseElement(newChangeInEl);
+  let [editorEl, ...rest] = this.parseAll(newChangeInEl);
+  if (!editorEl)
+    return console.error('element not parseable')
 
+
+  // this provide no significant as <h1 att> become <h1 att=""> in outerhtml
+  if (editorEl.outerHTML != newChangeInEl)
+    console.error('breaking change');
 
   let realDomTarget = this.domHtml.querySelector(`[data-element_id="${this.target}"]`);
   if (!realDomTarget)
-    console.error('target not found on real dom');
+    return console.error('target not found on real dom');
 
-
+  for (let el of rest)
+    realDomTarget.insertAdjacentElement('afterend'.el)
+  // todo: do by context
   this.rebuildDom(editorEl, realDomTarget)
 
 
@@ -607,7 +657,15 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, action, chang
 }
 
 domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
-
+  
+/**
+ * if oldChange and newChange both pretend to the same element we only process that element
+ * if oldChnage and newChange pretend to different element, choose the parent one or if no parent both
+ * 
+ * if the change is adding and is outside startTag new change decides otherwise the oldChange deicdes
+ * if the change is removing and is inside the new change decides otherwise oldchange decides
+ **/
+ 
   if (leftEl.tagName !== rightEl.tagName) {
     this.renameTagName(leftEl, rightEl)
     // rename rightEl.tagname
@@ -615,29 +673,99 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
   this.overwriteAttributes(leftEl, rightEl);
 
   const rightElChilds = rightEl.childNodes
+  const leftElChilds = Array.from(leftEl.childNodes);
+  // for (let [index, leftChild] of leftElChilds.entries()) {
+  let index = 0;
+  for (; index < leftElChilds.length; index++) {
+    let leftChild = leftElChilds[index],
+      rightChild = rightElChilds[index];
 
-  for (let [index, leftChild] of Array.from(leftEl.childNodes).entries()) {
+
     if (leftChild.constructor.name === 'Text') {
+
       // todo: parse html if there is any inside leftChild.data and arrange inside rightEl
-      if (rightElChilds[index].constructor.name === 'Text' && leftChild.data !== rightElChilds[index].data)
-        rightElChilds[index].data = leftChild.data;
+      if (rightChild) {
+        if (rightChild.constructor.name === 'Text') {
+          if (leftChild.data !== rightChild.data) {
+            //todo: trim????
+            rightChild.data = leftChild.data;
+          }
+        }
+        else {
+          if (leftChild.data.replace(/\s|\n|\t/g, '')) {
+            // if the change is nothing but space and dest is an element  
+            // continue;
+            rightChild.after(document.createTextNode(leftChild.data))
+          }
+
+        }
+
+      }
+      else if (!rightChild)
+        rightEl.insertAdjacentText('beforeend', leftChild.data)
+    }
+    else if (leftChild) {
+      if (rightChild) {
+        // todo: if it's a remove change it should be run
+
+        if (rightChild.constructor.name === 'Text') {
+
+          rightChild.remove();
+          index--;
+          // continue;
+
+        }
+        else {
+          let leftId = leftChild.getAttribute('data-element_id');
+          let rightId = rightChild.getAttribute('data-element_id')
+          if (leftId === rightId) {
+            // we might skip this as the change of child not matter
+            rebuildDom.call(this, leftChild, rightChild) // non-harsh replicating 
+          }
+          else {
+            if (!rightEl.querySelector(`:scope > [data-element_id="${leftId}"]`))
+              rightChild.after(leftChild)
+            else {
+              if (rightElChilds[index].id !== 'textArea') // dev only
+                rightElChilds[index--].remove()
+            }
+
+          }
+
+        }
+
+      }
       else
-        rightElChilds[index] = document.createTextNode(leftChild.data);
+        rightEl.insertAdjacentElement('beforeend', leftChild.cloneNode(true))
+
     }
     else {
-      rebuildDom(leftChild, rightElChilds[index])
+      if (rightChild.id !== 'textArea') // dev only
+        rightChild.remove();
+      index--;
     }
 
   }
 
+  // remove rest of the child in the element
+  while (rightElChilds[index]) {
+    if (rightElChilds[index].id !== 'textArea') // dev only
+      rightElChilds[index].remove()
+
+
+    index++;
+  }
 
 
 }
 
 domHtmlManipulator.prototype.renameTagName = function renameTagName(leftEl, rightEl) {
 
-  document.createElement(leftEl.tagName);
-  this.overwriteAttributes(leftEl.tagName)
+  let newRightEl = document.createElement(leftEl.tagName);
+  this.overwriteAttributes(leftEl, newRightEl);
+  newRightEl.replaceChildren(...leftEl.childNodes)
+  rightEl.replaceWith(newRightEl)
+
 }
 
 
@@ -648,6 +776,7 @@ domHtmlManipulator.prototype.overwriteAttributes = function overwriteAttributes(
       rightEl.setAttribute(leftAtt.name, leftAtt.value)
   }
 
+  // todo: begin from last index value of above for
   if (leftEl.attributes.length !== rightEl.attributes.length) {
     for (let rightAtt of rightEl.attributes) {
       if (!leftEl.attributes[rightAtt.name])
@@ -749,7 +878,8 @@ domHtmlManipulator.prototype.renameAttribute = function renameAttribute() {
     let attNameStart = attStartPos + match.index + match.groups.spaceBegin.length;
     let attNameEnd = attNameStart + match.groups.attName.length;
     let attValueStart = attNameEnd + 2;
-    let attValueEnd = attValueStart + match.groups.attValue.length;
+
+    let attValueEnd = attValueStart + match.groups.attValue ? match.groups.attValue.length : 0;
 
 
 
@@ -1012,3 +1142,6 @@ export default domHtmlManipulator;
 // add({ pos: 169, action: 'add', changeStr: '000' })
 // remove({ pos: 169, action: 'remove', removeLength: 2 })
 // test case 1
+
+
+
