@@ -82,10 +82,7 @@ domHtmlManipulator.prototype.findStartTagById = function findStartTagById() {
 
   this.target = this.param.target;
   this.tagName = tagStart.groups.tagName.toUpperCase();
-  if (tagStart && this.param.tagName && this.tagName !== this.param.tagName)
-    throw new Error(
-      "findPosition: tag name didn'tthis.param.tagName match, something is wrong"
-    );
+
 
   this.tagStPos = tagStart.index;
   this.tagStAfPos = tagStart.index +
