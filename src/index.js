@@ -277,14 +277,6 @@ domHtmlManipulator.prototype.getInnerText = function getInnerText() {
 
 
 
-domHtmlManipulator.prototype.setParam = function setParam(param) {
-
-  Object.assign(this.param, param);
-  if (param.tagName)
-    this.param.tagName = this.param.tagName.toUpperCase();
-}
-
-
 domHtmlManipulator.prototype.logFindPosition = function logFindPosition(p) {
   console.log(this.param,
     "=================start=====================>>>>>>>>>>>>>>>>>>>"
@@ -355,7 +347,7 @@ domHtmlManipulator.prototype.isPosOnEl = function isPosOnEl(elementIdPos, pathAr
 
   this.param.target = this.getId(elementIdPos + idSearch.length);
   if (!this.findStartTagById() || !this.findClosingTag())
-      return false;
+    return false;
 
   let tagStartPos = this.tagStPos;
   let tagEndPos = this.tagEnClAfPos || this.tagStClAfPos;
