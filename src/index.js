@@ -61,13 +61,14 @@ function domHtmlManipulator(html, domHtml) {
   this.atSt;
   this.atEn;
 
+  // 2 functions should be supported 
+  this.removeCallback;
+  this.addCallback;
+
 }
 
 
 domHtmlManipulator.prototype.findStartTagById = function findStartTagById() {
-
-
-
 
   let sch = `(?:${sps}data-element_id\=\"${this.param.target}\"${sps})`;
   let reg = `(?<tagWhole>${tgs}${at}*?${sch}${at}*?${the})`;
@@ -98,13 +99,16 @@ domHtmlManipulator.prototype.findStartTagById = function findStartTagById() {
     this.tagEnClAfPos = this.tagStClAfPos;
     this.isOmission = true; // if the tag doesn't have closing counterpart
   }
+  return true;
 };
 
 domHtmlManipulator.prototype.getWholeElement = function getWholeElement() {
-  if (!this.tagStPos) this.findStartTagById();
-  if (!this.tagEnPos) this.findClosingTag();
-
-  return { from: this.tagStPos, to: this.tagEnClAfPos };
+  if (this.findStartTagById()) {
+    this.findClosingTag()
+    return { from: this.tagStPos, to: this.tagStClAfPos || this.tagEnClAfPos };
+  }
+  else
+    return false;
 };
 
 
@@ -125,8 +129,7 @@ domHtmlManipulator.prototype.findClosingTag = function findClosingTag() {
         this.tagClosingTagName = i.groups.tagName.toUpperCase();
         this.tagClosingNameStart = 1 + i.groups.isClosing.length + this.tagEnPos;
         this.tagClosingNameEnd = this.tagClosingNameStart + i.groups.tagName.length;
-
-        break;
+        return true;
 
       }
       else
@@ -139,28 +142,39 @@ domHtmlManipulator.prototype.findClosingTag = function findClosingTag() {
 
 }
 
-domHtmlManipulator.prototype.getInsertAdjacentElement =
-  function getInsertAdjacentElement() {
-    if (!this.tagStPos) this.findStartTagById();
-    switch (this.param.property) {
-      case "beforebegin":
-        return { from: this.tagStPos };
+domHtmlManipulator.prototype.insertAdjacentElement =
+  function insertAdjacentElement({ target, position, element, elementValue, html }) {
 
-      case "afterbegin":
-        return { from: this.tagStClAfPos };
-
-      case "beforeend":
-        this.findClosingTag();
-        return { from: this.tagEnPos };
-
-      case "afterend":
-        this.findClosingTag();
-        return { from: this.tagEnClAfPos };
-
+    if (!elementValue) {
+      this.param.target = element;
+      let pos = this.getWholeElement();
+      if (!pos)
+        throw new Error('insertAdjacentElement: element not found');
+      elementValue = html.substring(pos.from, pos.to)
+      this.removeCallback(pos)
     }
 
-    // todo: remove line
-    // this.html.substr(this.tagStClAfPos);
+    this.param.target = target;
+    let pos = this.findStartTagById();
+    if (!pos)
+      throw new Error('insertAdjacentElement: target not found');
+
+    switch (position) {
+      case "beforebegin":
+        return this.addCallback({ value: elementValue, position: this.tagStPos })
+      case "afterbegin":
+        return this.addCallback({ value: elementValue, position: this.tagStClAfPos })
+      case "beforeend":
+        if (this.findClosingTag())
+          return this.addCallback({ value: elementValue, position: this.tagEnPos })
+        else return false;
+      case "afterend":
+        if (this.findClosingTag())
+          return this.addCallback({ value: elementValue, position: this.tagEnClAfPos })
+        else return false;
+    }
+
+
   };
 
 domHtmlManipulator.prototype.getClass = function getClass() {
