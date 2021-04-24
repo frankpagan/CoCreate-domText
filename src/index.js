@@ -360,9 +360,10 @@ domHtmlManipulator.prototype.getId = function getId(pos) {
 domHtmlManipulator.prototype.isPosOnEl = function isPosOnEl(elementIdPos, pathArray) {
 
   this.param.target = this.getId(elementIdPos + idSearch.length);
-  if (!this.findStartTagById() || !this.findClosingTag())
+  if (!this.findStartTagById())
     return false;
-
+  
+   this.findClosingTag()
   let tagStartPos = this.tagStPos;
   let tagEndPos = this.tagEnClAfPos || this.tagStClAfPos;
 
