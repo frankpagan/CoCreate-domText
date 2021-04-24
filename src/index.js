@@ -382,11 +382,7 @@ domHtmlManipulator.prototype.generateMapIdPos = function generateMapIdPos() {
 
 }
 
-// search the left for id and resolve start-iof1 otherwise don't search it ever again
-// 2: check if start-iof is what we need and return otherwise resolve end-iof1
-// check if end-iof is what we need and returen otherwise resolve start-iof2
-// check if start-iof2 is what we need and return otherwise resolve end-iof2
-// check if end-iof2 is what we need and return otherwise go to step 2 (next iofs)
+
 
 domHtmlManipulator.prototype.dumpPositions = function dumpPositions(pos) {
 
@@ -647,7 +643,7 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, action, chang
 
   // this provide no significant as <h1 att> become <h1 att=""> in outerhtml
   // replace it with html validator
-  let cleaned = editorEl.outerHTML.replace(/(\=\"\")|\ /g, '');
+  let cleaned = editorEl.outerHTML.replace(/(="")|\ /g, '');
   let cleaned2 = newChangeInEl.replace(/(="")|\ /g, '');
   if (cleaned != cleaned2)
     return console.error('breaking change');
@@ -710,15 +706,14 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
       // todo: parse html if there is any inside leftChild.data and arrange inside rightEl
       if (rightChild) {
         if (rightChild.constructor.name === 'Text') {
-          if (leftChild.data !== rightChild.data) {
-            //todo: trim????
+          if (leftChild.data.trim() !== rightChild.data.trim()) {
+    
             rightChild.data = leftChild.data;
           }
         }
         else {
           if (leftChild.data.replace(/\s|\n|\t/g, '')) {
             // if the change is nothing but space and dest is an element  
-            // continue;
             rightChild.after(document.createTextNode(leftChild.data))
           }
 
@@ -744,7 +739,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
           let rightId = rightChild.getAttribute('data-element_id')
           if (leftId === rightId) {
             // we might skip this as the change of child not matter
-            // rebuildDom.call(this, leftChild, rightChild) // non-harsh replicating 
+            rebuildDom.call(this, leftChild, rightChild) // non-harsh replicating 
           }
           else {
             if (leftId && rightEl.querySelector(`:scope > [data-element_id="${leftId}"]`)) {
