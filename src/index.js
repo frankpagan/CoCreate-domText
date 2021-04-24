@@ -75,10 +75,7 @@ domHtmlManipulator.prototype.findStartTagById = function findStartTagById() {
 
   if (!tagStart)
     return false;
-    // if (this.html.indexOf(idSearch + `"${this.param.target}"`) === -1)
-    //   throw new Error("findPosition: element can not be found. id:" + this.param.target);
-    // else
-    //   throw new Error("findPosition: element could be found but can not parse the element. id:" + this.param.target);
+
 
   this.target = this.param.target;
   this.tagName = tagStart.groups.tagName.toUpperCase();
