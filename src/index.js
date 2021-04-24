@@ -102,7 +102,7 @@ domHtmlManipulator.prototype.findStartTagById = function findStartTagById() {
   if (tagStart.groups.tagSlash) {
     this.tagEnPos = this.tagStClPos;
     this.tagEnClAfPos = this.tagStClAfPos;
-    this.isOmission = true;
+    this.isOmission = true; // if the tag doesn't have closing counterpart
   }
 };
 
@@ -281,18 +281,7 @@ domHtmlManipulator.prototype.getInnerText = function getInnerText() {
   return { from: this.tagStClAfPos, to: this.tagEnPos };
 }
 
-// param type
-//     {
-//   tagName: realTagName, // optional
-//   target,
 
-
-
-// }
-//   method,
-//   property,
-//   nextSibling,
-//   skip,
 
 domHtmlManipulator.prototype.setParam = function setParam(param) {
 
