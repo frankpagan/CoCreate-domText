@@ -352,25 +352,18 @@ domHtmlManipulator.prototype.getId = function getId(pos) {
 }
 
 domHtmlManipulator.prototype.isPosOnEl = function isPosOnEl(elementIdPos, pathArray) {
+
   this.param.target = this.getId(elementIdPos + idSearch.length);
+  if (!this.findStartTagById() || !this.findClosingTag())
+      return false;
 
-  try {
-    this.findStartTagById();
-    this.findClosingTag();
-    // pathArray.push(Object.assign({}, this))
-
-    let tagStartPos = this.tagStPos;
-    let tagEndPos = this.tagEnClAfPos || this.tagStClAfPos;
+  let tagStartPos = this.tagStPos;
+  let tagEndPos = this.tagEnClAfPos || this.tagStClAfPos;
 
 
-    if (this.pos > tagStartPos && this.pos < tagEndPos) {
-      return true
-    }
+  if (this.pos > tagStartPos && this.pos < tagEndPos) {
+    return true
   }
-  catch (err) {
-    return false;
-  }
-
 
   // tofo: test performance efficiency more variable or more logic
   // if (this.pos >= this.tagStClAfPos && this.pos <= this.tagEnClAfPos) {
@@ -519,7 +512,7 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, action, chang
 
   for (let el of rest)
     realDomTarget.insertAdjacentElement('afterend', el)
-    
+
   // todo: do by context
   this.rebuildDom(editorEl, realDomTarget)
 
@@ -548,7 +541,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
   if (leftEl.tagName !== rightEl.tagName) {
     this.renameTagName(leftEl, rightEl)
   }
-  
+
   this.overwriteAttributes(leftEl, rightEl);
 
   const rightElChilds = rightEl.childNodes
@@ -567,7 +560,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
       if (rightChild) {
         if (rightChild.constructor.name === 'Text') {
           if (leftChild.data.trim() !== rightChild.data.trim()) {
-    
+
             rightChild.data = leftChild.data;
           }
         }
