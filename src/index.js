@@ -362,8 +362,8 @@ domHtmlManipulator.prototype.isPosOnEl = function isPosOnEl(elementIdPos, pathAr
   this.param.target = this.getId(elementIdPos + idSearch.length);
   if (!this.findStartTagById())
     return false;
-  
-   this.findClosingTag()
+
+  this.findClosingTag()
   let tagStartPos = this.tagStPos;
   let tagEndPos = this.tagEnClAfPos || this.tagStClAfPos;
 
@@ -508,8 +508,8 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, action, chang
 
 
   // replacing ="" and all space to compare in more real situation
-  let cleaned = editorEl.outerHTML.replace(/(="")|\ /g, '');
-  let cleaned2 = newChangeInEl.replace(/(="")|\ /g, '');
+  let cleaned = editorEl.outerHTML.replace(/(="")|\ /g, '').toLowerCase();
+  let cleaned2 = newChangeInEl.replace(/(="")|\ /g, '').toLowerCase();
   if (cleaned != cleaned2)
     return console.error('breaking change');
 
@@ -677,18 +677,16 @@ domHtmlManipulator.prototype.findElByPos = function findElByPos(pos) {
   let pos2 = pos + idSearch.length;
 
 
-
-    pos1 = this.html.indexOf(idSearch, pos1 + idSearch.length);
-    if (pos1 !== -1 && this.isPosOnEl(pos1))
-      return true;
+  pos1 = this.html.indexOf(idSearch, pos1 + idSearch.length);
+  if (pos1 !== -1 && this.isPosOnEl(pos1))
+    return true;
 
   while (true) {
     pos2 = this.html.lastIndexOf(idSearch, pos2 - idSearch.length);
 
-    if (pos2 !== -1 )
-    {
-     if( this.isPosOnEl(pos2))
-      return true;
+    if (pos2 !== -1) {
+      if (this.isPosOnEl(pos2))
+        return true;
     }
     else return false;
   }
