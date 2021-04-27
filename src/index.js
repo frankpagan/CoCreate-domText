@@ -675,27 +675,23 @@ domHtmlManipulator.prototype.findElByPos = function findElByPos(pos) {
 
   let pos1 = pos - idSearch.length;
   let pos2 = pos + idSearch.length;
-  this.leftList = [];
-  this.rightList = [];
 
-  while (true) {
+
 
     pos1 = this.html.indexOf(idSearch, pos1 + idSearch.length);
     if (pos1 !== -1 && this.isPosOnEl(pos1))
       return true;
 
-
+  while (true) {
     pos2 = this.html.lastIndexOf(idSearch, pos2 - idSearch.length);
 
-    if (pos2 !== -1 && this.isPosOnEl(pos2))
+    if (pos2 !== -1 )
+    {
+     if( this.isPosOnEl(pos2))
       return true;
-
-
-    if (pos1 === -1 && pos2 === -1)
-      return false;
-
+    }
+    else return false;
   }
-
 
 }
 
