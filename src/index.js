@@ -381,7 +381,7 @@ domHtmlManipulator.prototype.isPosOnEl = function isPosOnEl(elementIdPos, pathAr
 domHtmlManipulator.prototype.parseAll = function parseAll(str) {
   let mainTag = str.match(/\<(?<tag>[a-z0-9]+)(.*?)?\>/).groups.tag;
   if (!mainTag)
-    console.error('find position: can not find the main tag');
+    throw new Error('find position: can not find the main tag');
   let doc = new DOMParser().parseFromString(str, "text/html");
   switch (mainTag) {
     case 'html':
@@ -482,10 +482,10 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, action, chang
 
   try {
     if (!this.findElByPos(pos))
-      return console.error("change doesn't represent in a new element ");
+       throw new Error("change doesn't represent in a new element ");
   }
   catch (err) {
-    return console.error("element can not be found")
+     throw new Error("element can not be found")
     // throw new Error("change doesn't represent in a new element ");
 
   }
@@ -504,18 +504,18 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, action, chang
 
   let [editorEl, ...rest] = this.parseAll(newChangeInEl);
   if (!editorEl)
-    return console.error('element not parseable')
+    throw new Error('element not parseable')
 
 
   // replacing ="" and all space to compare in more real situation
   let cleaned = editorEl.outerHTML.replace(/(="")|\ /g, '').toLowerCase();
   let cleaned2 = newChangeInEl.replace(/(="")|\ /g, '').toLowerCase();
   if (cleaned != cleaned2)
-    return console.error('breaking change');
+    return console.warn('breaking change');
 
   let realDomTarget = this.domHtml.querySelector(`[data-element_id="${this.target}"]`);
   if (!realDomTarget)
-    return console.error('target not found on real dom');
+    return console.warn('target not found on real dom');
 
   for (let el of rest)
     realDomTarget.insertAdjacentElement('afterend', el)
