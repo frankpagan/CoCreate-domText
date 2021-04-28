@@ -143,14 +143,14 @@ domHtmlManipulator.prototype.findClosingTag = function findClosingTag() {
 }
 
 domHtmlManipulator.prototype.insertAdjacentElement =
-  function insertAdjacentElement({ target, position, element, elementValue, html }) {
+  function insertAdjacentElement({ target, position, element, elementValue }) {
 
     if (!elementValue) {
       this.param.target = element;
       let pos = this.getWholeElement();
       if (!pos)
         throw new Error('insertAdjacentElement: element not found');
-      elementValue = html.substring(pos.from, pos.to)
+      elementValue = this.html.substring(pos.from, pos.to)
       this.removeCallback(pos)
     }
 
