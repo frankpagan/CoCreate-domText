@@ -62,8 +62,8 @@ function domHtmlManipulator(html, domHtml) {
   this.atEn;
 
   // 2 functions should be supported 
-  this.removeCallback = ()=>{};
-  this.addCallback = ()=>{};
+  this.removeCallback = () => {};
+  this.addCallback = () => {};
 
 }
 
@@ -105,7 +105,7 @@ domHtmlManipulator.prototype.findStartTagById = function findStartTagById() {
 domHtmlManipulator.prototype.getWholeElement = function getWholeElement() {
   if (this.findStartTagById()) {
     this.findClosingTag()
-    return { from: this.tagStPos, to: this.tagEnClAfPos || this.tagStClAfPos  };
+    return { from: this.tagStPos, to: this.tagEnClAfPos || this.tagStClAfPos };
   }
   else
     return false;
@@ -155,8 +155,8 @@ domHtmlManipulator.prototype.insertAdjacentElement =
     }
 
     this.param.target = target;
-    let pos = this.findStartTagById();
-    if (!pos)
+
+    if (!this.findStartTagById())
       throw new Error('insertAdjacentElement: target not found');
 
     switch (position) {
@@ -208,15 +208,22 @@ domHtmlManipulator.prototype.findClassPos = function findClassPos() {
       from: this.atEn,
     };
 };
-domHtmlManipulator.prototype.getStyle = function getStyle() {
+domHtmlManipulator.prototype.setStyle = function setStyle({target, style}) {
+  this.param.target = target;
   this.findAttribute("style", true);
   if (this.atSt === this.atEn) return { from: this.atSt, context: "value" };
   else if (this.atEn) {
+    // context: value
     let positions = this.findStylePos();
-    return { ...positions, context: "value" };
+    if(positions.to)
+      this.removeCallback(positions)
+    
+    this.addCallback({position: positions.from, style})
   }
-  // for set or remove
-  else return { from: this.atSt, context: "attribute" };
+  else {
+  // attribute style not exist
+    this.addCallback({position: this.atSt, value: `style="${style}"`})
+  }
 };
 
 domHtmlManipulator.prototype.findStylePos = function findStylePos() {
@@ -248,7 +255,8 @@ domHtmlManipulator.prototype.findStylePos = function findStylePos() {
 domHtmlManipulator.prototype.findAttribute =
   function findAttribute(property, isValueOnly) {
 
-    if (!this.tagStAfPos) this.findStartTagById();
+    if (!this.findStartTagById())
+      return false;
 
     let prRegAttr = getRegAttribute(property);
     let regex = `^(?<beforeAtt>${at}*?)${prRegAttr}`;
@@ -282,11 +290,17 @@ domHtmlManipulator.prototype.getSetAttribute = function getSetAttribute(type) {
 };
 
 
-domHtmlManipulator.prototype.getInnerText = function getInnerText() {
-  if (!this.tagStPos) this.findStartTagById();
-  this.findClosingTag();
+domHtmlManipulator.prototype.setInnerText = function setInnerText({ target, value }) {
+  this.param.target = target;
+  if (this.findStartTagById())
+    this.findClosingTag();
+  else
+    return false;
 
-  return { from: this.tagStClAfPos, to: this.tagEnPos };
+
+  this.removeCallback({ from: this.tagStClAfPos, to: this.tagEnPos });
+  this.addCallback({ position: this.tagStClAfPos, value });
+  return true;
 }
 
 
