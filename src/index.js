@@ -535,14 +535,13 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
       if (rightChild) {
         if (rightChild.constructor.name === 'Text') {
           if (leftChild.data.trim() !== rightChild.data.trim()) {
-
             rightChild.data = leftChild.data;
           }
         }
         else {
           if (leftChild.data.replace(/\s|\n|\t/g, '')) {
             // if the change is nothing but space and dest is an element  
-            rightChild.after(document.createTextNode(leftChild.data))
+            rightChild.before(document.createTextNode(leftChild.data))
           }
 
         }
