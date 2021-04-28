@@ -105,7 +105,7 @@ domHtmlManipulator.prototype.findStartTagById = function findStartTagById() {
 domHtmlManipulator.prototype.getWholeElement = function getWholeElement() {
   if (this.findStartTagById()) {
     this.findClosingTag()
-    return { from: this.tagStPos, to: this.tagStClAfPos || this.tagEnClAfPos };
+    return { from: this.tagStPos, to: this.tagEnClAfPos || this.tagStClAfPos  };
   }
   else
     return false;
