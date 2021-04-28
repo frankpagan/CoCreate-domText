@@ -500,24 +500,12 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, action, chang
   for (let el of rest)
     realDomTarget.insertAdjacentElement('afterend', el)
 
-  // todo: do by context
+
   this.rebuildDom(editorEl, realDomTarget)
 
 
 
-  // let secondPoint;
-  // if (changeStr) {
-  //   secondPoint = pos + changeStr.length;
-  //   if (secondPoint <= this.tagStPos && secondPoint >= this.tagEnClAfPos)
-  //     this.findElByPos(secondPoint);
 
-  // }
-  // else {
-  //   secondPoint = pos + removeLength;
-  //   if (secondPoint <= this.tagStPos && secondPoint >= this.tagEnClAfPos)
-  //     this.findElByPos(secondPoint);
-
-  // }
 
 
 }
