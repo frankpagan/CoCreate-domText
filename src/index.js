@@ -177,14 +177,20 @@ domHtmlManipulator.prototype.insertAdjacentElement =
 
   };
 
-domHtmlManipulator.prototype.getClass = function getClass() {
+
+
+
+domHtmlManipulator.prototype.setClass = function setClass({ target, classname }) {
+  this.param.target = target;
   this.findAttribute("class", true);
   if (this.atEn) {
     let positions = this.findClassPos();
-    return { ...positions, context: "value" };
+    if (positions.to)
+      this.removeCallback(positions)
+
+    this.addCallback({ position: positions.from, classname })
   }
-  // for set or remove
-  else return { from: this.atSt, context: "attribute" };
+
 };
 domHtmlManipulator.prototype.findClassPos = function findClassPos() {
   let prRegClass = getRegClass(this.param.property);
@@ -208,21 +214,22 @@ domHtmlManipulator.prototype.findClassPos = function findClassPos() {
       from: this.atEn,
     };
 };
-domHtmlManipulator.prototype.setStyle = function setStyle({target, style}) {
+domHtmlManipulator.prototype.setStyle = function setStyle({ target, style }) {
   this.param.target = target;
   this.findAttribute("style", true);
   if (this.atSt === this.atEn) return { from: this.atSt, context: "value" };
+
   else if (this.atEn) {
     // context: value
     let positions = this.findStylePos();
-    if(positions.to)
+    if (positions.to)
       this.removeCallback(positions)
-    
-    this.addCallback({position: positions.from, style})
+
+    this.addCallback({ position: positions.from, style })
   }
   else {
-  // attribute style not exist
-    this.addCallback({position: this.atSt, value: `style="${style}"`})
+    // attribute style not exist
+    this.addCallback({ position: this.atSt, value: `style="${style}"` })
   }
 };
 
@@ -276,19 +283,23 @@ domHtmlManipulator.prototype.findAttribute =
     }
   };
 
-domHtmlManipulator.prototype.getSetAttribute = function getSetAttribute(type) {
-  switch (type) {
-    case "get":
-    case "set":
-      this.findAttribute(this.param.property, true);
-      break;
-    case "remove":
-      this.findAttribute(this.param.property);
-      break;
-  }
-  return { from: this.atSt, to: this.atEn };
+
+
+domHtmlManipulator.prototype.setAttribute = function setAttribute({ target, name, value }) {
+  this.param.target = target;
+  this.findAttribute(name, true);
+  if (this.atEn)
+    this.removeCallback({ from: this.atSt, to: this.atEn })
+
+  this.addCallback({ position: this.atSt, value: `${name}="${value}"` })
 };
 
+domHtmlManipulator.prototype.removeAttribute = function removeAttribute({ target, name }) {
+  this.param.target = target;
+  this.findAttribute(name);
+  if (this.attEn)
+    this.removeCallback({ from: this.atSt, to: this.atEn })
+};
 
 domHtmlManipulator.prototype.setInnerText = function setInnerText({ target, value }) {
   this.param.target = target;
