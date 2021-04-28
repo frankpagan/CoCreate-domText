@@ -429,8 +429,6 @@ domHtmlManipulator.prototype.getContext = function getContext(start, end) {
   if (start > end)
     ([end, start] = [start, end])
 
-
-  // todo: is getContext working correctly?
   if (end > this.tagStPos && start <= this.tagStPos)
     return false;
   else if (end > this.tagStClAfPos && start < this.tagStClAfPos)
@@ -443,26 +441,8 @@ domHtmlManipulator.prototype.getContext = function getContext(start, end) {
   else if (start > this.tagNameEnd && start < this.tagStClPos || end > this.tagNameEnd && end < this.tagStClPos) {
     return this.getAttributeContext(start, end)
   }
-
   else
     return true;
-
-
-  // if (pos >= this.tagStAfPos && pos <= this.tagNameEnd) {
-  //   return 'firstTag'
-  // }
-  // else if (pos >= this.tagClosingNameStart && pos <= this.tagClosingNameEnd) {
-  //   return 'endTag'
-  // }
-  // else if (pos >= this.tagStClAfPos && pos <= this.tagEnPos) {
-  //   return 'innerContent'
-  // }
-  // else if (pos > this.tagNameEnd && pos < this.tagStClAfPos) {
-  //   return this.getAttributeContext()
-  // }
-  // else {
-  //   return false;
-  // }
 
 }
 
