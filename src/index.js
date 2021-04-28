@@ -190,6 +190,10 @@ domHtmlManipulator.prototype.setClass = function setClass({ target, classname })
 
     this.addCallback({ position: positions.from, classname })
   }
+  else
+  {
+    this.addCallback({ position: this.atSt, value: `class="${classname}"` })
+  }
 
 };
 domHtmlManipulator.prototype.findClassPos = function findClassPos() {
