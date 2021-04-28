@@ -482,10 +482,10 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, action, chang
 
   try {
     if (!this.findElByPos(pos))
-       throw new Error("change doesn't represent in a new element ");
+      throw new Error("change doesn't represent in a new element ");
   }
   catch (err) {
-     throw new Error("element can not be found")
+    throw new Error("element can not be found")
     // throw new Error("change doesn't represent in a new element ");
 
   }
@@ -651,14 +651,15 @@ domHtmlManipulator.prototype.renameTagName = function renameTagName(leftEl, righ
 
 
 domHtmlManipulator.prototype.overwriteAttributes = function overwriteAttributes(leftEl, rightEl) {
-  // todo: consider https://developer.mozilla.org/en-US/docs/Web/API/Attr/namespaceURI
-  // todo: try to set attribute as it might fail as there are weird parsing on broken html
+
   for (let leftAtt of leftEl.attributes) {
     if (!rightEl.attributes[leftAtt.name] || rightEl.attributes[leftAtt.name].value !== leftAtt.value)
-      rightEl.setAttribute(leftAtt.name, leftAtt.value)
+      try {
+        rightEl.setAttribute(leftAtt.name, leftAtt.value)
+      }
+    catch (err) {}
   }
 
-  // todo: begin from last index value of above for
   if (leftEl.attributes.length !== rightEl.attributes.length) {
     for (let rightAtt of rightEl.attributes) {
       if (!leftEl.attributes[rightAtt.name])
