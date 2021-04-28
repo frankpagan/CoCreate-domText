@@ -62,8 +62,8 @@ function domHtmlManipulator(html, domHtml) {
   this.atEn;
 
   // 2 functions should be supported 
-  this.removeCallback;
-  this.addCallback;
+  this.removeCallback = ()=>{};
+  this.addCallback = ()=>{};
 
 }
 
