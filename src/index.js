@@ -183,7 +183,7 @@ domHtmlManipulator.prototype.setClass = function setClass({ target, classname })
   this.param.target = target;
   this.findAttribute("class", true);
   if (this.atEn) {
-    let positions = this.findClassPos();
+    let positions = this.findClassPos(classname);
     if (positions.to)
       this.removeCallback(positions)
 
@@ -195,8 +195,8 @@ domHtmlManipulator.prototype.setClass = function setClass({ target, classname })
   }
 
 };
-domHtmlManipulator.prototype.findClassPos = function findClassPos() {
-  let prRegClass = getRegClass(this.param.property);
+domHtmlManipulator.prototype.findClassPos = function findClassPos(classname) {
+  let prRegClass = getRegClass(classname);
 
   let classStart = this.html
     .substring(this.atSt, this.atEn)
@@ -224,7 +224,7 @@ domHtmlManipulator.prototype.setStyle = function setStyle({ target, style }) {
 
   else if (this.atEn) {
     // context: value
-    let positions = this.findStylePos();
+    let positions = this.findStylePos(style);
     if (positions.to)
       this.removeCallback(positions)
 
@@ -236,10 +236,9 @@ domHtmlManipulator.prototype.setStyle = function setStyle({ target, style }) {
   }
 };
 
-domHtmlManipulator.prototype.findStylePos = function findStylePos() {
-  let prRegStyle = getRegStyle(this.param.property);
-  // console.log('fffffffffffff',this.atSt, this.atEn, html
-  //   .substring(this.atSt, this.atEn));return;
+domHtmlManipulator.prototype.findStylePos = function findStylePos(style) {
+  let prRegStyle = getRegStyle(style);
+
   let styleStart = this.html
     .substring(this.atSt, this.atEn)
     .match(
