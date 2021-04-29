@@ -18,7 +18,7 @@ let allClassName = '[^"]+?';
 let sps = `${space}*?`;
 let spa = `${space}+?`;
 let tgs = `(?:<(?<tagName>[a-z0-9]+?)${sps})`;
-let endtgs = `(?:<(?<isClosing>${sps}\/${sps})?(?<tagName>[a-z0-9]+?)${sps})`;
+let getEndTag = tagName => `(?:<(?<isClosing>${sps}\/${sps})?${tagName}${sps})`;
 
 const getRegAttribute = (attributeName) =>
   `(?:${spa}${attributeName}(?:="[^"]*?")?${sps})`;
@@ -115,7 +115,7 @@ domHtmlManipulator.prototype.getWholeElement = function getWholeElement() {
 domHtmlManipulator.prototype.findClosingTag = function findClosingTag() {
 
   let match = this.html.substr(this.tagStClAfPos)
-    .matchAll(new RegExp(`(?<tagWhole>${endtgs}${at}*?${the})`, 'g'));
+    .matchAll(new RegExp(`(?<tagWhole>${getEndTag(this.tagName)}${at}*?${the})`, 'gi'));
 
   if (!match) throw new Error('could find any closing tag');
 
@@ -126,9 +126,8 @@ domHtmlManipulator.prototype.findClosingTag = function findClosingTag() {
       if (!nest) {
         this.tagEnPos = this.tagStClAfPos + i.index;
         this.tagEnClAfPos = this.tagStClAfPos + i.index + i[0].length;
-        this.tagClosingTagName = i.groups.tagName.toUpperCase();
         this.tagClosingNameStart = 1 + i.groups.isClosing.length + this.tagEnPos;
-        this.tagClosingNameEnd = this.tagClosingNameStart + i.groups.tagName.length;
+        this.tagClosingNameEnd = this.tagClosingNameStart + this.tagName.length;
         return true;
 
       }
