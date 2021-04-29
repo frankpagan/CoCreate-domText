@@ -201,7 +201,7 @@ domHtmlManipulator.prototype.setClass = function setClass({ target, classname })
     this.addCallback({ position: positions.from, classname })
   }
   else {
-    this.addCallback({ position: this.atSt, value: `class="${classname}"` })
+    this.addCallback({ position: this.atSt, value: ` class="${classname}"` })
   }
 
 };
@@ -242,7 +242,7 @@ domHtmlManipulator.prototype.setStyle = function setStyle({ target, style }) {
   }
   else {
     // attribute style not exist
-    this.addCallback({ position: this.atSt, value: `style="${style}"` })
+    this.addCallback({ position: this.atSt, value: ` style="${style}"` })
   }
 };
 
@@ -303,7 +303,7 @@ domHtmlManipulator.prototype.setAttribute = function setAttribute({ target, name
   if (this.atEn)
     this.removeCallback({ from: this.atSt, to: this.atEn })
 
-  this.addCallback({ position: this.atSt, value: `${name}="${value}"` })
+  this.addCallback({ position: this.atSt, value: ` ${name}="${value}"` })
 };
 
 domHtmlManipulator.prototype.removeAttribute = function removeAttribute({ target, name }) {
