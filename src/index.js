@@ -352,7 +352,7 @@ domHtmlManipulator.prototype.parseAll = function parseAll(str) {
   let doc = new DOMParser().parseFromString(str, "text/html");
   switch (mainTag) {
     case 'html':
-      return [doc.body.parentElement];
+      return [doc.documentElement];
     case 'body':
       return [doc.body];
     case 'head':
