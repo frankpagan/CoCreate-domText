@@ -62,11 +62,22 @@ function domHtmlManipulator(html, domHtml) {
   this.atEn;
 
   // 2 functions should be supported 
-  this.removeCallback = () => {};
-  this.addCallback = () => {};
+
 
 }
 
+domHtmlManipulator.prototype.setCallback = function setCallback({ addCallback, removeCallback }) {
+
+  this.removeCallback = function(param) {
+    this.html = this.html.removeAt(param.from, param.to);
+    removeCallback.call(null, param)
+  };
+  this.addCallback = function(param) {
+    this.html = this.html.replaceAt(param.position, param.value)
+    addCallback.call(null, param)
+  };
+
+}
 
 domHtmlManipulator.prototype.findStartTagById = function findStartTagById() {
 
@@ -189,8 +200,7 @@ domHtmlManipulator.prototype.setClass = function setClass({ target, classname })
 
     this.addCallback({ position: positions.from, classname })
   }
-  else
-  {
+  else {
     this.addCallback({ position: this.atSt, value: `class="${classname}"` })
   }
 
