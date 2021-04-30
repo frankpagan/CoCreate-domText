@@ -249,22 +249,22 @@ domHtmlManipulator.prototype.findClassPos = function findClassPos(classname) {
       from: this.atEn,
     };
 };
-domHtmlManipulator.prototype.setStyle = function setStyle({ target, style }) {
+domHtmlManipulator.prototype.setStyle = function setStyle({ target, styleName }) {
   this.param.target = target;
   this.findAttribute("style", true);
   if (this.atSt === this.atEn) return { from: this.atSt, context: "value" };
 
   else if (this.atEn) {
     // context: value
-    let positions = this.findStylePos(style);
+    let positions = this.findStylePos(styleName);
     if (positions.to)
       this.removeCallback(positions)
 
-    this.addCallback({ position: positions.from, value: style })
+    this.addCallback({ position: positions.from, value: styleName })
   }
   else {
-    // attribute style not exist
-    this.addCallback({ position: this.atSt, value: ` style="${style}"` })
+    // attribute styleName not exist
+    this.addCallback({ position: this.atSt, value: ` style="${styleName}"` })
   }
 };
 
