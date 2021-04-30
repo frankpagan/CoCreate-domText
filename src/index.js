@@ -205,6 +205,28 @@ domHtmlManipulator.prototype.setClass = function setClass({ target, classname })
   }
 
 };
+domHtmlManipulator.prototype.setClassStyle = function setClassStyle({ target, styleName , value}) {
+  this.param.target = target;
+  this.findAttribute("class", true);
+  if (this.atEn) {
+    
+    // let properties = this.html
+    // .substring(this.atSt, this.atEn).forEach()
+        let positions = this.findStylePos(styleName);
+    if (positions.to)
+      this.removeCallback(positions)
+
+    this.addCallback({ position: positions.from, value: `${styleName}:${value}` })
+    
+
+  }
+  else {
+    this.addCallback({ position: this.atSt, value: ` class="${styleName}:${value}"` })
+  }
+
+};
+
+
 domHtmlManipulator.prototype.findClassPos = function findClassPos(classname) {
   let prRegClass = getRegClass(classname);
 
