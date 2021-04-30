@@ -198,7 +198,7 @@ domHtmlManipulator.prototype.setClass = function setClass({ target, classname })
     if (positions.to)
       this.removeCallback(positions)
 
-    this.addCallback({ position: positions.from, classname })
+    this.addCallback({ position: positions.from, value: classname })
   }
   else {
     this.addCallback({ position: this.atSt, value: ` class="${classname}"` })
@@ -260,7 +260,7 @@ domHtmlManipulator.prototype.setStyle = function setStyle({ target, style }) {
     if (positions.to)
       this.removeCallback(positions)
 
-    this.addCallback({ position: positions.from, style })
+    this.addCallback({ position: positions.from, value: style })
   }
   else {
     // attribute style not exist
