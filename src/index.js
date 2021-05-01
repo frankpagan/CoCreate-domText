@@ -94,8 +94,7 @@ domHtmlManipulator.prototype.findStartTagById = function findStartTagById() {
 
 
   this.tagStPos = tagStart.index;
-  this.tagStAfPos = tagStart.index +
-    (this.param.tagName ? this.param.tagName.length : 0) + 1;
+  this.tagStAfPos = tagStart.index + this.tagName.length + 1;
   this.tagStClPos =
     tagStart.index +
     tagStart.groups.tagWhole.length -
@@ -400,7 +399,7 @@ domHtmlManipulator.prototype.parseAll = function parseAll(str) {
 
 
 domHtmlManipulator.prototype.getAttributeContext = function getAttributeContext(start, end) {
-  let attStartPos = this.tagStAfPos + this.tagName.length;
+  let attStartPos = this.tagStAfPos;
   let attStr = this.html
     .substring(attStartPos, this.tagStClPos);
 
