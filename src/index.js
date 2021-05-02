@@ -24,6 +24,7 @@ const getRegAttribute = (attributeName) =>
   `(?:${spa}${attributeName}(?:="[^"]*?")?${sps})`;
 const getRegStyle = (styleName) =>
   `(?:${sps}${styleName}${sps}\:${sps}[^\;]+?${sps}\;${sps})`;
+const getRegClassStyle = (styleName) => `(?:${sps}${styleName}:[^ ]+${sps})`;
 const getRegClass = (className) => `(?:${sps}${className}${sps})`;
 const getTagClose = (tagName) => `(?:${sps}\/${sps}${tagName}${sps})`;
 const getRegTagStart = (tagName) => `(?:<${tagName}${sps})`;
@@ -187,47 +188,25 @@ domHtmlManipulator.prototype.insertAdjacentElement =
   };
 
 
-
-
-domHtmlManipulator.prototype.setClass = function setClass({ target, classname }) {
+domHtmlManipulator.prototype.setClass = function setClass({ target, classname, value }) {
   this.param.target = target;
   this.findAttribute("class", true);
+  let classnameStr = value ? ` ${classname}:${value}` : ' ' + classname;
   if (this.atEn) {
     let positions = this.findClassPos(classname);
     if (positions.to)
       this.removeCallback(positions)
 
-    this.addCallback({ position: positions.from, value: classname })
+    this.addCallback({ position: positions.from, value: classnameStr })
   }
   else {
-    this.addCallback({ position: this.atSt, value: ` class="${classname}"` })
-  }
-
-};
-domHtmlManipulator.prototype.setClassStyle = function setClassStyle({ target, styleName , value}) {
-  this.param.target = target;
-  this.findAttribute("class", true);
-  if (this.atEn) {
-    
-    // let properties = this.html
-    // .substring(this.atSt, this.atEn).forEach()
-        let positions = this.findStylePos(styleName);
-    if (positions.to)
-      this.removeCallback(positions)
-
-    this.addCallback({ position: positions.from, value: `${styleName}:${value}` })
-    
-
-  }
-  else {
-    this.addCallback({ position: this.atSt, value: ` class="${styleName}:${value}"` })
+    this.addCallback({ position: this.atSt, value:   ` class="${classnameStr}"` })
   }
 
 };
 
-
-domHtmlManipulator.prototype.findClassPos = function findClassPos(classname) {
-  let prRegClass = getRegClass(classname);
+domHtmlManipulator.prototype.findClassPos = function findClassPos(classname, isStyle) {
+  let prRegClass = isStyle ? getRegClassStyle(classname) : getRegClass(classname);
 
   let classStart = this.html
     .substring(this.atSt, this.atEn)

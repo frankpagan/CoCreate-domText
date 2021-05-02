@@ -7,14 +7,14 @@ const HtmlWebpackPlugin = require("html-webpack-plugin")
 
 module.exports = {
   entry: {
-    "CoCreate-textToDom-test": "./src/testpage.js",
+    "CoCreate-domText-test": "./src/testpage.js",
   },
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: isProduction ? "[name].min.js" : "[name].js",
     libraryTarget: "umd",
     libraryExport: "default",
-    library: ["CoCreate", "textToDom"],
+    library: ["CoCreate", "domText"],
     globalObject: "this",
     // publicPath: 'https://server.cocreate.app/CoCreateJS/dist/'
   },

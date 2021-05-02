@@ -12,9 +12,9 @@ module.exports = {
             "document_id": "601f3e0f6b402c72efc07e03",
             "key": "src",
             "data":{
-                "name": "textToDom Doc",
+                "name": "domText Doc",
                 "domains": ["cocreate.app", "server.cocreate.app", "ws.cocreate.app"],
-                "path": "/docs/textToDom"
+                "path": "/docs/domText"
             }
         }
     ],

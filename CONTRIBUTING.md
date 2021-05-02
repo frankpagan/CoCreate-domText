@@ -1,19 +1,19 @@
-# Contributing to CoCreate-textToDom
+# Contributing to CoCreate-domText
 
-This project is work of [many contributors](https://github.com/CoCreate-app/CoCreate-textToDom/graphs/contributors).
-You're encouraged to submit [pull requests](https://github.com/CoCreate-app/CoCreate-textToDom/pulls),
-[propose features and discuss issues](https://github.com/CoCreate-app/CoCreate-textToDom/issues).
+This project is work of [many contributors](https://github.com/CoCreate-app/CoCreate-domText/graphs/contributors).
+You're encouraged to submit [pull requests](https://github.com/CoCreate-app/CoCreate-domText/pulls),
+[propose features and discuss issues](https://github.com/CoCreate-app/CoCreate-domText/issues).
 
 In the examples below, substitute your Github username for `contributor` in URLs.
 
 ## Fork the Project
 
-Fork the [project on Github](https://github.com/CoCreate-app/CoCreate-textToDom) and check out your copy.
+Fork the [project on Github](https://github.com/CoCreate-app/CoCreate-domText) and check out your copy.
 
 ```
-git textToDom https://github.com/contributor/CoCreate-textToDom.git
-cd CoCreate-textToDom
-git remote add upstream https://github.com/CoCreate-app/CoCreate-textToDom.git
+git domText https://github.com/contributor/CoCreate-domText.git
+cd CoCreate-domText
+git remote add upstream https://github.com/CoCreate-app/CoCreate-domText.git
 ```
 
 ## Create a Topic Branch
@@ -75,7 +75,7 @@ git push origin my-feature-branch
 
 ## Make a Pull Request
 
-Go to [https://github.com/CoCreate-app/CoCreate-textToDom](https://github.com/CoCreate-app/CoCreate-textToDom) and select your feature branch.
+Go to [https://github.com/CoCreate-app/CoCreate-domText](https://github.com/CoCreate-app/CoCreate-domText) and select your feature branch.
 Click the 'Pull Request' button and fill out the form. Pull requests are usually reviewed within a few days.
 
 ## Rebase

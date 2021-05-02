@@ -30,7 +30,7 @@ npm manifest:
   {
     "name": "@cocreate/text-to-dom",
     "version": "0.1",
-    "description": "A simple textToDom component in vanilla javascript. Easily configured using HTML5 data-attributes and/or JavaScript API.",
+    "description": "A simple domText component in vanilla javascript. Easily configured using HTML5 data-attributes and/or JavaScript API.",
     "keywords": [
       "text-to-dom",
       "cocreate",
@@ -60,14 +60,14 @@ npm manifest:
     },
     "repository": {
       "type": "git",
-      "url": "git+https://github.com/CoCreate-app/CoCreate-textToDom.git"
+      "url": "git+https://github.com/CoCreate-app/CoCreate-domText.git"
     },
     "author": "CoCreate LLC",
     "license": "UNLICENSED",
     "bugs": {
-      "url": "https://github.com/CoCreate-app/CoCreate-textToDom/issues"
+      "url": "https://github.com/CoCreate-app/CoCreate-domText/issues"
     },
-    "homepage": "https://cocreate.app/docs/textToDom",
+    "homepage": "https://cocreate.app/docs/domText",
     "funding": {
       "type": "GitHub Sponsors ❤",
       "url": "https://github.com/sponsors/CoCreate-app"
