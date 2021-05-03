@@ -29,7 +29,8 @@
     "dev": "npx webpack --config webpack.config.js --watch",
     "dev2": "npx webpack --config webpackdev.config.js --watch",
     "test": "npx webpack --config webpacktest.config.js --watch",
-    "docs": "node ./node_modules/@cocreate/docs/src/index.js"
+    "docs": "node ./node_modules/@cocreate/docs/src/index.js",
+    "hosting": "node ./node_modules/@cocreate/hosting/src/index.js"
   },
   "repository": {
     "type": "git",
