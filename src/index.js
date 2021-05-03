@@ -200,7 +200,7 @@ domHtmlManipulator.prototype.setClass = function setClass({ target, classname, v
     this.addCallback({ position: positions.from, value: classnameStr })
   }
   else {
-    this.addCallback({ position: this.atSt, value:   ` class="${classnameStr}"` })
+    this.addCallback({ position: this.atSt, value: ` class="${classnameStr}"` })
   }
 
 };
@@ -423,8 +423,38 @@ domHtmlManipulator.prototype.getContext = function getContext(start, end) {
 
 }
 
+/**
+ * apply an add change for a html to its counterpart dom
+ * 
+ * @param {Object} config - the config
+ * @param {Number} config.pos - position of the change that happened
+ * @param {String} condif.changeStr - the added string to the config.pos
+ * 
+ */
 
-domHtmlManipulator.prototype.changeDom = function changeDom({ pos, action, changeStr, removeLength, html }) {
+domHtmlManipulator.prototype.addToDom = function addToDom({ pos, changeStr }) {
+
+    this.html = this.html.replaceAt(pos, changeStr.length)
+    this.changeDom({ pos, changeStr })
+
+
+}
+/**
+ * apply a remove change for a html to its counterpart dom
+ * 
+ * @param {Object} config - the config
+ * @param {Number} config.pos - position of the change that happened
+ * @param {Number} condif.removeLength - the added string to the config.pos
+ */
+domHtmlManipulator.prototype.removeFromDom = function removeFromDom({ pos, removeLength }) {
+
+    this.html = this.html.removeAt(pos, removeLength);
+    this.changeDom({ pos, removeLength })
+
+
+}
+
+domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, removeLength }) {
   if (pos < 0 || pos > this.html.length)
     throw new Error('position is out of range');
 
@@ -434,8 +464,7 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, action, chang
   this.changeStr = changeStr;
   this.removeLength = removeLength;
   this.pos = pos;
-  this.action = action;
-  this.html = html;
+
 
   try {
     if (!this.findElByPos(pos))
