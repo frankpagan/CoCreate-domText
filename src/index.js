@@ -166,36 +166,39 @@ domHtmlManipulator.prototype.findClosingTag = function findClosingTag() {
 domHtmlManipulator.prototype.insertAdjacentElement =
   function insertAdjacentElement({ target, position, element, elementValue }) {
 
-      this.param.target = element;
-      this.reset();
+    this.param.target = element;
+    this.reset();
+
+    let pos;
     if (!elementValue) {
-      let pos = this.getWholeElement();
+      pos = this.getWholeElement();
       if (!pos)
         throw new Error('insertAdjacentElement: element not found');
       elementValue = this.html.substring(pos.from, pos.to)
-      this.removeCallback(pos)
+
     }
 
-   
 
+    this.param.target = target;
+    this.reset();
     if (!this.findStartTagById())
       throw new Error('insertAdjacentElement: target not found');
 
-    switch (position) {
+    
+     switch (position) {
       case "beforebegin":
-        return this.addCallback({ value: elementValue, position: this.tagStPos })
       case "afterbegin":
-        return this.addCallback({ value: elementValue, position: this.tagStClAfPos })
+            this.removeCallback(pos);
+        return this.addCallback({ value: elementValue, position: position == 'beforebegin' ? this.tagStPos :  this.tagStClAfPos })
       case "beforeend":
-        if (this.findClosingTag())
-          return this.addCallback({ value: elementValue, position: this.tagEnPos })
-        else return false;
       case "afterend":
-        if (this.findClosingTag())
-          return this.addCallback({ value: elementValue, position: this.tagEnClAfPos })
-        else return false;
+        if (!this.findClosingTag())
+          throw new Error('closing tag could not be found');
+            this.removeCallback(pos);
+            return this.addCallback({ value: elementValue, position: position == 'beforeend' ? this.tagEnPos :  this.tagEnClAfPos })
     }
-
+    
+    
 
   };
 
