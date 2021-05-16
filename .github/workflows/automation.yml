@@ -62,7 +62,7 @@ jobs:
           aws-access-key: "${{ secrets.AWSSECERTACCESSKEY }}"
           bucket: testcrudbucket
           source: ./dist
-          destination: "/textToDom/${{env.VERSION}}"
+          destination: "/domText/${{env.VERSION}}"
           acl: public-read
       - name: upload bundle as latest
         uses: CoCreate-app/CoCreate-s3@master
@@ -71,9 +71,8 @@ jobs:
           aws-access-key: "${{ secrets.AWSSECERTACCESSKEY }}"
           bucket: testcrudbucket
           source: ./dist
-          destination: /textToDom/latest
+          destination: /domText/latest
           acl: public-read
-
   dist:
     runs-on: ubuntu-latest
     needs: release
