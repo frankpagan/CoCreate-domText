@@ -203,23 +203,42 @@ domHtmlManipulator.prototype.insertAdjacentElement =
   };
 
 
-domHtmlManipulator.prototype.setClass = function setClass({ target, classname, value }) {
+domHtmlManipulator.prototype.setClass = function setClass({ target, classname }) {
   this.param.target = target;
   this.reset();
   this.findAttribute("class");
-  let classnameStr = value ? ` ${classname}:${value}` : ' ' + classname;
+
   if (this.atVEn) {
     let positions = this.findClassPos(classname);
     if (positions.to)
       this.removeCallback(positions)
 
-    this.addCallback({ position: positions.from, value: classnameStr })
+    this.addCallback({ position: positions.from, value: classname })
   }
   else {
+    this.addCallback({ position: this.atSt, value: ` class="${classname}"` })
+  }
+
+};
+
+domHtmlManipulator.prototype.setClassStyle = function setClassStyle({ target, classname, value, unit }) {
+  this.param.target = target;
+  this.reset();
+  this.findAttribute("class");
+  let classnameStr = value ? ` ${classname}:${value+unit}` : ' ' + classname;
+  if (this.atVEn) {
+    let positions = this.findClassPos(classname);
+    if (positions.to)
+      this.removeCallback(positions)
+    if (value)
+      this.addCallback({ position: positions.from, value: classnameStr })
+  }
+  else if (value) {
     this.addCallback({ position: this.atSt, value: ` class="${classnameStr}"` })
   }
 
 };
+
 
 domHtmlManipulator.prototype.findClassPos = function findClassPos(classname, isStyle) {
   let prRegClass = isStyle ? getRegClassStyle(classname) : getRegClass(classname);
@@ -290,7 +309,7 @@ domHtmlManipulator.prototype.findStylePos = function findStylePos(style) {
 // findAttribute
 domHtmlManipulator.prototype.findAttribute =
   function findAttribute(property) {
-    
+
     if (!this.findStartTagById())
       return false;
 
@@ -317,7 +336,7 @@ domHtmlManipulator.prototype.findAttribute =
 
 
 domHtmlManipulator.prototype.setAttribute = function setAttribute({ target, name, value }) {
-  
+
   this.param.target = target;
   this.reset();
   this.findAttribute(name);
