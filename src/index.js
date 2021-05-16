@@ -81,10 +81,14 @@ domHtmlManipulator.prototype.reset = function reset() {
 domHtmlManipulator.prototype.setCallback = function setCallback({ addCallback, removeCallback }) {
 
   this.removeCallback = function(param) {
+    if (!param)
+      return false;
     this.html = this.html.removeAt(param.from, param.to);
     removeCallback.call(null, param)
   };
   this.addCallback = function(param) {
+    if (!param)
+      return false;
     this.html = this.html.replaceAt(param.position, param.value)
     addCallback.call(null, param)
   };
