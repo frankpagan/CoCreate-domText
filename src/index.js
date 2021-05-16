@@ -66,7 +66,18 @@ function domHtmlManipulator(html, domHtml) {
 
 
 }
-
+domHtmlManipulator.prototype.reset = function reset() {
+  this.atEn = null, this.atSt = null, this.atVSt = null, this.atVSt = null;
+  this.tagStPos = null;
+  this.tagStAfPos = null;
+  this.tagStClPos = null;
+  this.tagStClAfPos = null;
+  this.tagEnPos = null;
+  this.tagEnClAfPos = null;
+  this.isOmission = null;
+  this.tagNameEnd = null;
+  this.haveClosingTag = null;
+}
 domHtmlManipulator.prototype.setCallback = function setCallback({ addCallback, removeCallback }) {
 
   this.removeCallback = function(param) {
@@ -155,8 +166,9 @@ domHtmlManipulator.prototype.findClosingTag = function findClosingTag() {
 domHtmlManipulator.prototype.insertAdjacentElement =
   function insertAdjacentElement({ target, position, element, elementValue }) {
 
-    if (!elementValue) {
       this.param.target = element;
+      this.reset();
+    if (!elementValue) {
       let pos = this.getWholeElement();
       if (!pos)
         throw new Error('insertAdjacentElement: element not found');
@@ -164,7 +176,7 @@ domHtmlManipulator.prototype.insertAdjacentElement =
       this.removeCallback(pos)
     }
 
-    this.param.target = target;
+   
 
     if (!this.findStartTagById())
       throw new Error('insertAdjacentElement: target not found');
@@ -190,6 +202,7 @@ domHtmlManipulator.prototype.insertAdjacentElement =
 
 domHtmlManipulator.prototype.setClass = function setClass({ target, classname, value }) {
   this.param.target = target;
+  this.reset();
   this.findAttribute("class");
   let classnameStr = value ? ` ${classname}:${value}` : ' ' + classname;
   if (this.atVEn) {
@@ -200,7 +213,7 @@ domHtmlManipulator.prototype.setClass = function setClass({ target, classname, v
     this.addCallback({ position: positions.from, value: classnameStr })
   }
   else {
-    this.addCallback({ position: this.atVSt, value: ` class="${classnameStr}"` })
+    this.addCallback({ position: this.atSt, value: ` class="${classnameStr}"` })
   }
 
 };
@@ -209,28 +222,29 @@ domHtmlManipulator.prototype.findClassPos = function findClassPos(classname, isS
   let prRegClass = isStyle ? getRegClassStyle(classname) : getRegClass(classname);
 
   let classStart = this.html
-    .substring(this.atSt, this.atEn)
+    .substring(this.atVSt, this.atVEn)
     .match(
       new RegExp(`(?<ourClass>${prRegClass})(?<classstyle>\:[^\"\ ]+)(\ |\")?`, "is")
     );
 
   if (classStart && classStart.groups.ourClass)
     return {
-      from: this.atSt + classStart.index,
-      to: this.atSt +
+      from: this.atVSt + classStart.index,
+      to: this.atVSt +
         classStart.index +
         classStart.groups.ourClass.length +
         classStart.groups.classstyle.length,
     };
   else
     return {
-      from: this.atEn,
+      from: this.atVEn,
     };
 };
 domHtmlManipulator.prototype.setStyle = function setStyle({ target, styleName }) {
   this.param.target = target;
+  this.reset();
   this.findAttribute("style");
-  if (this.atVSt === this.atVEn) return { from: this.atSt, context: "value" };
+  if (this.atVSt === this.atVEn) return { from: this.atVSt, context: "value" };
 
   else if (this.atVEn) {
     // context: value
@@ -242,7 +256,7 @@ domHtmlManipulator.prototype.setStyle = function setStyle({ target, styleName })
   }
   else {
     // attribute styleName not exist
-    this.addCallback({ position: this.atVSt, value: ` style="${styleName}"` })
+    this.addCallback({ position: this.atSt, value: ` style="${styleName}"` })
   }
 };
 
@@ -250,7 +264,7 @@ domHtmlManipulator.prototype.findStylePos = function findStylePos(style) {
   let prRegStyle = getRegStyle(style);
 
   let styleStart = this.html
-    .substring(this.atSt, this.atEn)
+    .substring(this.atVSt, this.atVEn)
     .match(
       new RegExp(`^(?<styleWhole>${sty})*?(?<ourStyle>${prRegStyle})`, "is")
     );
@@ -259,13 +273,13 @@ domHtmlManipulator.prototype.findStylePos = function findStylePos(style) {
       styleStart.groups.styleWhole.length :
       0;
     return {
-      from: this.atSt + stlWleLen,
-      to: this.atSt + stlWleLen + styleStart.groups.ourStyle.length,
+      from: this.atVSt + stlWleLen,
+      to: this.atVSt + stlWleLen + styleStart.groups.ourStyle.length,
     };
   }
   else
     return {
-      from: this.atEn,
+      from: this.atVEn,
     };
 };
 
@@ -273,7 +287,7 @@ domHtmlManipulator.prototype.findStylePos = function findStylePos(style) {
 // findAttribute
 domHtmlManipulator.prototype.findAttribute =
   function findAttribute(property) {
-
+    
     if (!this.findStartTagById())
       return false;
 
@@ -298,9 +312,11 @@ domHtmlManipulator.prototype.findAttribute =
 
 
 
+
 domHtmlManipulator.prototype.setAttribute = function setAttribute({ target, name, value }) {
-  this.atEn = null, this.atSt = null;
+  
   this.param.target = target;
+  this.reset();
   this.findAttribute(name);
   if (this.atEn)
     this.removeCallback({ from: this.atSt, to: this.atEn })
@@ -310,6 +326,7 @@ domHtmlManipulator.prototype.setAttribute = function setAttribute({ target, name
 
 domHtmlManipulator.prototype.removeAttribute = function removeAttribute({ target, name }) {
   this.param.target = target;
+  this.reset();
   this.findAttribute(name);
   if (this.attEn)
     this.removeCallback({ from: this.atSt, to: this.atEn })
@@ -317,6 +334,7 @@ domHtmlManipulator.prototype.removeAttribute = function removeAttribute({ target
 
 domHtmlManipulator.prototype.setInnerText = function setInnerText({ target, value }) {
   this.param.target = target;
+  this.reset();
   if (this.findStartTagById())
     this.findClosingTag();
   else
@@ -339,6 +357,7 @@ domHtmlManipulator.prototype.getId = function getId(pos) {
 domHtmlManipulator.prototype.isPosOnEl = function isPosOnEl(elementIdPos, pathArray) {
 
   this.param.target = this.getId(elementIdPos + idSearch.length);
+  this.reset();
   if (!this.findStartTagById())
     return false;
 
