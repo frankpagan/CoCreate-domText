@@ -481,7 +481,7 @@ domHtmlManipulator.prototype.getContext = function getContext(start, end) {
 
 domHtmlManipulator.prototype.addToDom = function addToDom({ pos, changeStr }) {
 
-  this.html = this.html.replaceAt(pos, changeStr.length)
+  this.html = this.html.replaceAt(pos, changeStr)
   this.changeDom({ pos, changeStr })
 
 
