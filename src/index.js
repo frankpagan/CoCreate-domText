@@ -50,6 +50,7 @@ let attributeList = new RegExp(`${spaceBegin}(?<att>(?<attName>[a-z0-9\-\_]+)(${
 let textdomfr = new Map(),
   textdomfa = new Map();
 
+let extraMeta = new RegExp(`(="")|${space}`,'g');
 function domHtmlManipulator(html, domHtml) {
 
   this.html = html;
@@ -558,9 +559,10 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
     throw new Error('element not parseable')
 
 
+  
   // replacing ="" and all space to compare in more real situation
-  let cleaned = editorEl.outerHTML.replace(/(="")|\ /g, '').toLowerCase();
-  let cleaned2 = newChangeInEl.replace(/(="")|\ /g, '').toLowerCase();
+  let cleaned = editorEl.outerHTML.replace(extraMeta, '').toLowerCase();
+  let cleaned2 = newChangeInEl.replace(extraMeta, '').toLowerCase();
   if (cleaned != cleaned2)
     return console.warn('breaking change');
 
@@ -580,99 +582,172 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
 
 
 }
+domHtmlManipulator.prototype.elIndexOf = function elIndexOf(el, elList, from) {
+  if (!Array.isArray(elList))
+    elList = Array.from(elList);
+  return elList.indexOf(el, from);
+
+}
 
 domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
 
   if (leftEl.tagName !== rightEl.tagName) {
-    this.renameTagName(leftEl, rightEl)
+    this.renameTagName(leftEl, rightEl);
+    // todo: we should break here in theory
   }
 
   this.overwriteAttributes(leftEl, rightEl);
+  // todo: if any change we should break here too
+  
 
   const rightElChilds = rightEl.childNodes
   const leftElChilds = Array.from(leftEl.childNodes);
 
 
-  let index = 0;
-  for (; index < leftElChilds.length; index++) {
+  let index = 0,
+    len = leftElChilds.length;
+  for (; index < len; index++) {
     let leftChild = leftElChilds[index],
       rightChild = rightElChilds[index];
 
 
-    if (leftChild.constructor.name === 'Text') {
+    let leftIsText = leftChild.constructor.name === 'Text';
 
-
-      if (rightChild) {
-        if (rightChild.constructor.name === 'Text') {
-          if (leftChild.data.trim() !== rightChild.data.trim()) {
-            rightChild.data = leftChild.data;
-          }
-        }
-        else {
-          if (leftChild.data.replace(/\s|\n|\t/g, '')) {
-            // if the change is nothing but space and dest is an element  
-            rightChild.before(document.createTextNode(leftChild.data))
-          }
-
-        }
-
-      }
-      else if (!rightChild)
+    if (!rightChild) {
+      if (leftIsText)
         rightEl.insertAdjacentText('beforeend', leftChild.data)
-    }
-    else if (leftChild) {
-      if (rightChild) {
-
-
-        if (rightChild.constructor.name === 'Text') {
-
-          rightChild.remove();
-          index--;
-          // continue;
-
-        }
-        else {
-          let leftId = leftChild.getAttribute('data-element_id');
-          let rightId = rightChild.getAttribute('data-element_id')
-          if (leftId === rightId) {
-            // we might skip this as the change of child not matter
-            rebuildDom.call(this, leftChild, rightChild) // non-harsh replicating 
-          }
-          else {
-            if (leftId && rightEl.querySelector(`:scope > [data-element_id="${leftId}"]`)) {
-              if (!(rightId && leftEl.querySelector(`:scope > [data-element_id="${rightId}"]`))) {
-                if (rightElChilds[index].id !== 'textArea') // dev only
-                  rightElChilds[index--].remove()
-              }
-            }
-            else
-              rightChild.before(leftChild)
-
-          }
-
-        }
-
-      }
       else
         rightEl.insertAdjacentElement('beforeend', leftChild.cloneNode(true))
-
     }
     else {
-      if (rightChild.id !== 'textArea') // dev only
-        rightChild.remove();
-      index--;
+      let rightIsText = rightChild.constructor.name === 'Text';
+
+      if (leftIsText) {
+        if (rightIsText) {
+          if(leftChild.data.trim() !== rightChild.data.trim())
+            rightChild.data = leftChild.data;
+        }
+        else {
+          rightChild.before(document.createTextNode(leftChild.data))
+          let rightId = rightChild.getAttribute('data-element_id');
+          let elIndex = this.elIndexOf(rightChild, leftElChilds)
+          if (elIndex === -1) {
+            rightEl.remove()
+            index--;
+            continue;
+          }
+          else
+            rightElChilds[elIndex].before(rightChild);
+
+
+        }
+      }
+      else {
+        let leftId = leftChild.getAttribute('data-element_id');
+
+        if (rightIsText) {
+          rightChild.before(leftChild.cloneNode(true));
+          rightChild.remove();
+        }
+        else {
+
+          let rightId = rightChild.getAttribute('data-element_id');
+          if (rightId !== leftId) {
+
+            let elIndex = this.elIndexOf(rightChild, leftElChilds)
+            if (elIndex === -1) {
+              rightEl.remove()
+              index--;
+              continue;
+            }
+            else
+              rightElChilds[elIndex].before(rightChild);
+          }
+        }
+      }
+
+
     }
+
+
+    // if () {
+
+
+    //   if (rightChild) {
+    //     if (rightChild.constructor.name === 'Text') {
+    //       if (leftChild.data.trim() !== rightChild.data.trim()) {
+    //         rightChild.data = leftChild.data;
+    //       }
+    //     }
+    //     else {
+    //       if (leftChild.data.replace(/\s|\n|\t/g, '')) {
+    //         // if the change is nothing but space and dest is an element  
+    //         rightChild.before(document.createTextNode(leftChild.data))
+    //       }
+
+    //     }
+
+    //   }
+    //   else
+    //     rightEl.insertAdjacentText('beforeend', leftChild.data)
+    // }
+    // else if (leftChild) {
+    //   if (!rightChild)
+    //     rightEl.insertAdjacentElement('beforeend', leftChild.cloneNode(true))
+    //   else {
+
+
+    //     if (rightChild.constructor.name === 'Text') {
+    //       // if right.text.trim exist in left keep it otherwise remove
+    //       // and put left in right position
+    //       rightChild.before(leftChild.cloneNode(true))
+    //       // rightChild.remove();
+    //       // index--;
+    //       // continue;
+
+    //     }
+    //     else {
+    //       let leftId = leftChild.getAttribute('data-element_id');
+    //       let rightId = rightChild.getAttribute('data-element_id');
+    //       // todo: if(leftid) check if it's in map, then ignore leftEl otherwise save it 
+    //       if (leftId === rightId) {
+    //         // we might skip this as the change of child not matter
+    //         // rebuildDom.call(this, leftChild, rightChild) 
+    //       }
+    //       else {
+    //         if (leftId && rightEl.querySelector(`:scope > [data-element_id="${leftId}"]`)) {
+
+
+    //           if (!(rightId && leftEl.querySelector(`:scope > [data-element_id="${rightId}"]`))) {
+    //             rightElChilds[index--].remove()
+    //           }
+    //         }
+    //         else {
+
+    //           rightChild.before(leftChild)
+    //           // rightChild.remove();
+    //         }
+
+    //       }
+
+    //     }
+
+    //   }
+
+
+    // }
+    // else {
+
+    //   rightChild.remove();
+    //   index--;
+    // }
 
   }
 
   // remove rest of the child in the element
   while (rightElChilds[index]) {
-    if (rightElChilds[index].id !== 'textArea') // dev only
-      rightElChilds[index].remove()
-
-
-    index++;
+    rightElChilds[index].remove()
   }
 
 
