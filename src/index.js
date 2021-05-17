@@ -46,6 +46,10 @@ let spaceEnd = `(?<spaceEnd>${sps})`;
 let attValue = `(?:(?:="(?<attValue>[^"]*?)")|${spa})`
 let attributeList = new RegExp(`${spaceBegin}(?<att>(?<attName>[a-z0-9\-\_]+)(${attValue})?)${spaceEnd}`, 'gis');
 
+
+let textdomfr = new Map(),
+  textdomfa = new Map();
+
 function domHtmlManipulator(html, domHtml) {
 
   this.html = html;
@@ -83,12 +87,15 @@ domHtmlManipulator.prototype.setCallback = function setCallback({ addCallback, r
   this.removeCallback = function(param) {
     if (!param)
       return false;
+    textdomfr.set(param.from * param.to, true);
     this.html = this.html.removeAt(param.from, param.to);
     removeCallback.call(null, param)
   };
   this.addCallback = function(param) {
     if (!param)
       return false;
+
+    textdomfa.set(param.position + param.value, true);
     this.html = this.html.replaceAt(param.position, param.value)
     addCallback.call(null, param)
   };
@@ -481,6 +488,12 @@ domHtmlManipulator.prototype.getContext = function getContext(start, end) {
 
 domHtmlManipulator.prototype.addToDom = function addToDom({ pos, changeStr }) {
 
+  let key = pos + changeStr;
+  if (textdomfa.has(key)) {
+    textdomfa.delete(key)
+    return;
+
+  }
   this.html = this.html.replaceAt(pos, changeStr)
   this.changeDom({ pos, changeStr })
 
@@ -495,7 +508,13 @@ domHtmlManipulator.prototype.addToDom = function addToDom({ pos, changeStr }) {
  */
 domHtmlManipulator.prototype.removeFromDom = function removeFromDom({ pos, removeLength }) {
 
-  this.html = this.html.removeAt(pos, removeLength);
+  let key = pos * (removeLength + pos);
+  if (textdomfr.has(key)) {
+    textdomfr.delete(key)
+    return;
+
+  }
+  this.html = this.html.removeAt(pos, pos + removeLength);
   this.changeDom({ pos, removeLength })
 
 
@@ -511,7 +530,6 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
   this.changeStr = changeStr;
   this.removeLength = removeLength;
   this.pos = pos;
-
 
   try {
     if (!this.findElByPos(pos))
