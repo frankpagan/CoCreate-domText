@@ -88,7 +88,7 @@ domHtmlManipulator.prototype.setCallback = function setCallback({ addCallback, r
     if (!param)
       return false;
     textdomfr.set(param.from * param.to, true);
-    this.html = this.html.removeAt(param.from, param.to);
+    // this.html = this.html.removeAt(param.from, param.to);
     removeCallback.call(null, param)
   };
   this.addCallback = function(param) {
@@ -96,7 +96,7 @@ domHtmlManipulator.prototype.setCallback = function setCallback({ addCallback, r
       return false;
 
     textdomfa.set(param.position + param.value, true);
-    this.html = this.html.replaceAt(param.position, param.value)
+    // this.html = this.html.replaceAt(param.position, param.value)
     addCallback.call(null, param)
   };
 
@@ -494,7 +494,7 @@ domHtmlManipulator.prototype.addToDom = function addToDom({ pos, changeStr }) {
     return;
 
   }
-  this.html = this.html.replaceAt(pos, changeStr)
+  // this.html = this.html.replaceAt(pos, changeStr)
   this.changeDom({ pos, changeStr })
 
 
@@ -514,7 +514,7 @@ domHtmlManipulator.prototype.removeFromDom = function removeFromDom({ pos, remov
     return;
 
   }
-  this.html = this.html.removeAt(pos, pos + removeLength);
+  // this.html = this.html.removeAt(pos, pos + removeLength);
   this.changeDom({ pos, removeLength })
 
 
