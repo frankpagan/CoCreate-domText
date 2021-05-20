@@ -678,7 +678,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
           rightChild.remove();
         }
         else {
-
+          // teleport element if exist otherwise create it
           let rightId = rightChild.getAttribute('data-element_id');
 
           if (rightId !== leftId) {
@@ -689,6 +689,8 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
             else
               rightChild.before(leftChild.cloneNode(true))
 
+            // new element has been added we should process the new element again at index
+            
             rightChild = rightElChilds[index];
             rightId = rightChild.getAttribute('data-element_id');
 
