@@ -585,9 +585,17 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
 
 
 }
+
+function isTextOrEl(el) {
+  if (el instanceof window.Text)
+    return true
+  else if (el instanceof window.Element)
+    return false
+}
+
 domHtmlManipulator.prototype.elIndexOf = function elIndexOf(id, elList, from) {
   for (let i = 0; i < elList.length; i++) {
-    if (elList[i].constructor.name != "Text" && elList[i].getAttribute('data-element_id') == id)
+    if ( isTextOrEl(elList[i]) === false && elList[i].getAttribute('data-element_id') == id)
       return i;
   }
 
@@ -595,6 +603,8 @@ domHtmlManipulator.prototype.elIndexOf = function elIndexOf(id, elList, from) {
   // Array.from(elList).some(el => el.getAttribute('data-element_id') == id)
 
 }
+
+
 
 domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
@@ -619,16 +629,21 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
       rightChild = rightElChilds[index];
 
 
-    let leftIsText = leftChild.constructor.name === 'Text';
+    let leftIsText = isTextOrEl(leftChild)
 
     if (!rightChild) {
-      if (leftIsText)
+      if (leftIsText === true)
         rightEl.insertAdjacentText('beforeend', leftChild.data)
-      else
+      else if (leftIsText === false)
         rightEl.insertAdjacentElement('beforeend', leftChild.cloneNode(true))
+      else
+        continue;
     }
     else {
-      let rightIsText = rightChild.constructor.name === 'Text';
+
+      let rightIsText = isTextOrEl(rightChild)
+      if (rightIsText === undefined)
+        continue;
 
       if (leftIsText) {
         if (rightIsText) {
@@ -641,7 +656,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
           let elIndex = this.elIndexOf(rightId, rightEl.childNodes)
           if (elIndex === -1) {
             rightChild.remove();
-            if (rightElChilds[index].constructor.name === 'Text' && rightElChilds[index - 1] && rightElChilds[index - 1].constructor.name === 'Text') {
+            if (isTextOrEl(rightElChilds[index]) === true && rightElChilds[index - 1] && isTextOrEl(rightElChilds[index - 1]) === true) {
               rightElChilds[index - 1].data += rightElChilds[index].data;
               rightElChilds[index].remove()
             }
@@ -680,7 +695,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
             elIndex = this.elIndexOf(rightId, rightEl.childNodes)
             if (elIndex === -1) {
               rightChild.remove()
-              if (rightElChilds[index].constructor.name === 'Text' && rightElChilds[index - 1] && rightElChilds[index - 1].constructor.name === 'Text') {
+              if (isTextOrEl(rightElChilds[index]) === true && rightElChilds[index - 1] && isTextOrEl(rightElChilds[index - 1]) === true) {
                 rightElChilds[index - 1].data += rightElChilds[index].data;
                 rightElChilds[index].remove()
               }
@@ -692,8 +707,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
             else if (rightElChilds[elIndex] && rightElChilds[elIndex] !== rightChild)
               rightElChilds[elIndex].before(rightChild);
           }
-          else
-          {
+          else {
             this.rebuildDom.call(this, leftChild, rightChild)
           }
         }
