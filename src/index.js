@@ -576,7 +576,7 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
   for (let el of rest)
     realDomTarget.insertAdjacentElement('afterend', el)
 
-
+  // todo: recognize html tag either by nesting rebuildDom or by itself as a selector as html is unique
   this.rebuildDom(editorEl, realDomTarget)
 
 
@@ -585,10 +585,7 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
 
 
 }
-domHtmlManipulator.prototype.elIndexOf = function elIndexOf(el, elList, from) {
-  let id = el.getAttribute('data-element_id');
-  if (!id)
-    return -1;
+domHtmlManipulator.prototype.elIndexOf = function elIndexOf(id, elList, from) {
   for (let i = 0; i < elList.length; i++) {
     if (elList[i].constructor.name != "Text" && elList[i].getAttribute('data-element_id') == id)
       return i;
@@ -641,7 +638,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
         else {
           rightChild.before(document.createTextNode(leftChild.data))
           let rightId = rightChild.getAttribute('data-element_id');
-          let elIndex = this.elIndexOf(rightChild, leftEl.childNodes)
+          let elIndex = this.elIndexOf(rightId, rightEl.childNodes)
           if (elIndex === -1) {
             rightChild.remove();
             if (rightElChilds[index].constructor.name === 'Text' && rightElChilds[index - 1] && rightElChilds[index - 1].constructor.name === 'Text') {
@@ -652,7 +649,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
             index--;
             continue;
           }
-          else if (rightElChilds[elIndex] !== rightChild)
+          else if (rightElChilds[elIndex] && rightElChilds[elIndex] !== rightChild)
             rightElChilds[elIndex].before(rightChild);
 
 
@@ -668,9 +665,19 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
         else {
 
           let rightId = rightChild.getAttribute('data-element_id');
-          if (rightId !== leftId) {
 
-            let elIndex = this.elIndexOf(rightChild, leftEl.childNodes)
+          if (rightId !== leftId) {
+            let elIndex = this.elIndexOf(leftId, rightEl.childNodes);
+
+            if (elIndex !== -1)
+              rightChild.insertAdjacentElement('beforebegin', rightEl.childNodes[elIndex])
+            else
+              rightChild.before(leftChild.cloneNode(true))
+
+            rightChild = rightElChilds[index];
+            rightId = rightChild.getAttribute('data-element_id');
+
+            elIndex = this.elIndexOf(rightId, rightEl.childNodes)
             if (elIndex === -1) {
               rightChild.remove()
               if (rightElChilds[index].constructor.name === 'Text' && rightElChilds[index - 1] && rightElChilds[index - 1].constructor.name === 'Text') {
@@ -685,6 +692,10 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
             else if (rightElChilds[elIndex] && rightElChilds[elIndex] !== rightChild)
               rightElChilds[elIndex].before(rightChild);
           }
+          else
+          {
+            this.rebuildDom.call(this, leftChild, rightChild)
+          }
         }
       }
 
@@ -697,29 +708,33 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
   while (rightElChilds[index]) {
     rightElChilds[index].remove()
   }
-  console.log('>>>>>>>>>', this.isElEqual(leftEl, rightEl))
+
+  if (this.isElEqual(leftEl, rightEl))
+    console.log('>>>>>>>>>', true)
+  else
+    console.log('>>>>>>>>>', false)
 
 }
 
 
 domHtmlManipulator.prototype.isElEqual = function isElEqual(leftEl, rightEl) {
   if (leftEl.tagName != rightEl.tagName)
-    return false;
+    throw false;
 
 
   if (leftEl.attributes.length != rightEl.attributes.length)
-    return false;
+    throw false;
 
 
   for (let leftAtt of leftEl.attributes) {
     if (!rightEl.attributes[leftAtt.name])
-      return false;
+      throw false;
     else if (rightEl.attributes[leftAtt.name].value != leftAtt.value)
-      return false;
+      throw false;
   }
 
   if (!this.isDomEqul(leftEl, rightEl))
-    return false;
+    throw false;
 
   return true;
 }
@@ -735,25 +750,25 @@ domHtmlManipulator.prototype.isDomEqul = function isDomEqul(leftEl, rightEl) {
       if (rightElChilds[i]) {
         if (rightElChilds[i].constructor.name == "Text") {
           if (rightElChilds[i].data.trim() !== leftElChilds[i].data.trim())
-            return false;
+            throw false;
         }
         else
-          return false;
+          throw false;
       }
       else
-        return false;
+        throw false;
     }
     else {
       if (rightElChilds[i]) {
         if (rightElChilds[i].constructor.name != "Text") {
           if (!this.isElEqual(leftElChilds[i], rightElChilds[i]))
-            return false;
+            throw false;
         }
         else
-          return false;
+          throw false;
       }
       else
-        return false;
+        throw false;
 
 
     }
