@@ -197,18 +197,20 @@ domHtmlManipulator.prototype.insertAdjacentElement =
     if (!this.findStartTagById())
       throw new Error('insertAdjacentElement: target not found');
 
-
+    let insertPos;
     switch (position) {
       case "beforebegin":
       case "afterbegin":
         this.removeCallback(pos);
-        return this.addCallback({ value: elementValue, position: position == 'beforebegin' ? this.tagStPos : this.tagStClAfPos })
+        insertPos = (position == 'beforebegin' ? this.tagStPos : this.tagStClAfPos) - (pos.to - pos.from);
+        return this.addCallback({ value: elementValue, position: insertPos })
       case "beforeend":
       case "afterend":
         if (!this.findClosingTag())
           throw new Error('closing tag could not be found');
         this.removeCallback(pos);
-        return this.addCallback({ value: elementValue, position: position == 'beforeend' ? this.tagEnPos : this.tagEnClAfPos })
+        insertPos = (position == 'beforeend' ? this.tagEnPos : this.tagEnClAfPos) - (pos.to - pos.from);
+        return this.addCallback({ value: elementValue, position: insertPos })
     }
 
 
