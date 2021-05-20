@@ -682,7 +682,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
               index--;
               continue;
             }
-            else if (rightElChilds[elIndex] !== rightChild)
+            else if (rightElChilds[elIndex] && rightElChilds[elIndex] !== rightChild)
               rightElChilds[elIndex].before(rightChild);
           }
         }
