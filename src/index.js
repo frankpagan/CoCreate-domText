@@ -697,7 +697,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
   while (rightElChilds[index]) {
     rightElChilds[index].remove()
   }
-  console.log('>>>>>>>>>', this.isDomEqul(leftEl, rightEl))
+  console.log('>>>>>>>>>', this.isElEqual(leftEl, rightEl))
 
 }
 
@@ -717,6 +717,10 @@ domHtmlManipulator.prototype.isElEqual = function isElEqual(leftEl, rightEl) {
     else if (rightEl.attributes[leftAtt.name].value != leftAtt.value)
       return false;
   }
+
+  if (!this.isDomEqul(leftEl, rightEl))
+    return false;
+
   return true;
 }
 
@@ -725,11 +729,12 @@ domHtmlManipulator.prototype.isDomEqul = function isDomEqul(leftEl, rightEl) {
   const rightElChilds = rightEl.childNodes
   const leftElChilds = leftEl.childNodes;
 
+
   for (let i = 0; i < leftElChilds.length; i++) {
     if (leftElChilds[i].constructor.name == "Text") {
       if (rightElChilds[i]) {
         if (rightElChilds[i].constructor.name == "Text") {
-          if (rightElChilds[i].data !== leftElChilds[i])
+          if (rightElChilds[i].data.trim() !== leftElChilds[i].data.trim())
             return false;
         }
         else
@@ -771,15 +776,23 @@ domHtmlManipulator.prototype.overwriteAttributes = function overwriteAttributes(
   for (let leftAtt of leftEl.attributes) {
     if (!rightEl.attributes[leftAtt.name] || rightEl.attributes[leftAtt.name].value !== leftAtt.value)
       try {
-        rightEl.setAttribute(leftAtt.name, leftAtt.value)
+        if (leftAtt.name != 'data-element_id')
+          rightEl.setAttribute(leftAtt.name, leftAtt.value)
       }
     catch (err) {}
   }
 
   if (leftEl.attributes.length !== rightEl.attributes.length) {
-    for (let rightAtt of rightEl.attributes) {
-      if (!leftEl.attributes[rightAtt.name])
+    for (let i = 0, len = rightEl.attributes.length; i < len; i++) {
+      let rightAtt = rightEl.attributes[i];
+      if (!leftEl.attributes[rightAtt.name] && rightAtt.name != 'data-element_id') {
         rightEl.removeAttribute(rightAtt.name)
+        i--, len--;
+      }
+
+
+
+
     }
 
   }
