@@ -1,4 +1,3 @@
-
 export function logFindPosition(p) {
   console.log(this.param,
     "=================start=====================>>>>>>>>>>>>>>>>>>>"
@@ -56,3 +55,62 @@ export function logFindPositionNodeJs(p) {
 
 
 
+
+export function isElEqual(leftEl, rightEl) {
+  if (leftEl.tagName != rightEl.tagName)
+    return false;
+
+
+  if (leftEl.attributes.length != rightEl.attributes.length)
+    return false;
+
+
+  for (let leftAtt of leftEl.attributes) {
+    if (!rightEl.attributes[leftAtt.name])
+      return false;
+    else if (rightEl.attributes[leftAtt.name].value != leftAtt.value)
+      return false;
+  }
+
+  if (!this.isDomEqul(leftEl, rightEl))
+    return false;
+
+  return true;
+}
+
+
+export function isDomEqul(leftEl, rightEl) {
+  const rightElChilds = rightEl.childNodes
+  const leftElChilds = leftEl.childNodes;
+
+
+  for (let i = 0; i < leftElChilds.length; i++) {
+    if (leftElChilds[i].constructor.name == "Text") {
+      if (rightElChilds[i]) {
+        if (rightElChilds[i].constructor.name == "Text") {
+          if (rightElChilds[i].data.trim() !== leftElChilds[i].data.trim())
+            return false;
+        }
+        else
+          return false;
+      }
+      else
+        return false;
+    }
+    else {
+      if (rightElChilds[i]) {
+        if (rightElChilds[i].constructor.name != "Text") {
+          if (!this.isElEqual(leftElChilds[i], rightElChilds[i]))
+            return false;
+        }
+        else
+          return false;
+      }
+      else
+        return false;
+
+
+    }
+  }
+  return true;
+}

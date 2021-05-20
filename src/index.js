@@ -595,7 +595,7 @@ function isTextOrEl(el) {
 
 domHtmlManipulator.prototype.elIndexOf = function elIndexOf(id, elList, from) {
   for (let i = 0; i < elList.length; i++) {
-    if ( isTextOrEl(elList[i]) === false && elList[i].getAttribute('data-element_id') == id)
+    if (isTextOrEl(elList[i]) === false && elList[i].getAttribute('data-element_id') == id)
       return i;
   }
 
@@ -723,72 +723,11 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
     rightElChilds[index].remove()
   }
 
-  if (this.isElEqual(leftEl, rightEl))
-    console.log('>>>>>>>>>', true)
-  else
-    console.log('>>>>>>>>>', false)
+
 
 }
 
 
-domHtmlManipulator.prototype.isElEqual = function isElEqual(leftEl, rightEl) {
-  if (leftEl.tagName != rightEl.tagName)
-    throw false;
-
-
-  if (leftEl.attributes.length != rightEl.attributes.length)
-    throw false;
-
-
-  for (let leftAtt of leftEl.attributes) {
-    if (!rightEl.attributes[leftAtt.name])
-      throw false;
-    else if (rightEl.attributes[leftAtt.name].value != leftAtt.value)
-      throw false;
-  }
-
-  if (!this.isDomEqul(leftEl, rightEl))
-    throw false;
-
-  return true;
-}
-
-
-domHtmlManipulator.prototype.isDomEqul = function isDomEqul(leftEl, rightEl) {
-  const rightElChilds = rightEl.childNodes
-  const leftElChilds = leftEl.childNodes;
-
-
-  for (let i = 0; i < leftElChilds.length; i++) {
-    if (leftElChilds[i].constructor.name == "Text") {
-      if (rightElChilds[i]) {
-        if (rightElChilds[i].constructor.name == "Text") {
-          if (rightElChilds[i].data.trim() !== leftElChilds[i].data.trim())
-            throw false;
-        }
-        else
-          throw false;
-      }
-      else
-        throw false;
-    }
-    else {
-      if (rightElChilds[i]) {
-        if (rightElChilds[i].constructor.name != "Text") {
-          if (!this.isElEqual(leftElChilds[i], rightElChilds[i]))
-            throw false;
-        }
-        else
-          throw false;
-      }
-      else
-        throw false;
-
-
-    }
-  }
-  return true;
-}
 
 domHtmlManipulator.prototype.renameTagName = function renameTagName(leftEl, rightEl) {
 
