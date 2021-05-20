@@ -50,7 +50,8 @@ let attributeList = new RegExp(`${spaceBegin}(?<att>(?<attName>[a-z0-9\-\_]+)(${
 let textdomfr = new Map(),
   textdomfa = new Map();
 
-let extraMeta = new RegExp(`(="")|${space}`,'g');
+let extraMeta = new RegExp(`(="")|${space}`, 'g');
+
 function domHtmlManipulator(html, domHtml) {
 
   this.html = html;
@@ -89,7 +90,7 @@ domHtmlManipulator.prototype.setCallback = function setCallback({ addCallback, r
     if (!param)
       return false;
     textdomfr.set(param.from * param.to, true);
-    // this.html = this.html.removeAt(param.from, param.to);
+    this.html = this.html.removeAt(param.from, param.to);
     removeCallback.call(null, param)
   };
   this.addCallback = function(param) {
@@ -97,7 +98,7 @@ domHtmlManipulator.prototype.setCallback = function setCallback({ addCallback, r
       return false;
 
     textdomfa.set(param.position + param.value, true);
-    // this.html = this.html.replaceAt(param.position, param.value)
+    this.html = this.html.replaceAt(param.position, param.value)
     addCallback.call(null, param)
   };
 
@@ -559,12 +560,12 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
     throw new Error('element not parseable')
 
 
-  
+
   // replacing ="" and all space to compare in more real situation
-  let cleaned = editorEl.outerHTML.replace(extraMeta, '').toLowerCase();
-  let cleaned2 = newChangeInEl.replace(extraMeta, '').toLowerCase();
-  if (cleaned != cleaned2)
-    return console.warn('breaking change');
+  // let cleaned = editorEl.outerHTML.replace(extraMeta, '').toLowerCase();
+  // let cleaned2 = newChangeInEl.replace(extraMeta, '').toLowerCase();
+  // if (cleaned != cleaned2)
+  //   return console.warn('breaking change');
 
   let realDomTarget = this.domHtml.querySelector(`[data-element_id="${this.target}"]`);
   if (!realDomTarget)
@@ -583,9 +584,16 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
 
 }
 domHtmlManipulator.prototype.elIndexOf = function elIndexOf(el, elList, from) {
-  if (!Array.isArray(elList))
-    elList = Array.from(elList);
-  return elList.indexOf(el, from);
+  let id = el.getAttribute('data-element_id');
+  if (!id)
+    return -1;
+  for (let i = 0; i < elList.length; i++) {
+    if (elList[i].constructor.name != "Text" && elList[i].getAttribute('data-element_id') == id)
+      return i;
+  }
+
+  return -1;
+  // Array.from(elList).some(el => el.getAttribute('data-element_id') == id)
 
 }
 
@@ -599,7 +607,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
   this.overwriteAttributes(leftEl, rightEl);
   // todo: if any change we should break here too
-  
+
 
   const rightElChilds = rightEl.childNodes
   const leftElChilds = Array.from(leftEl.childNodes);
@@ -625,19 +633,24 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
       if (leftIsText) {
         if (rightIsText) {
-          if(leftChild.data.trim() !== rightChild.data.trim())
+          if (leftChild.data.trim() !== rightChild.data.trim())
             rightChild.data = leftChild.data;
         }
         else {
           rightChild.before(document.createTextNode(leftChild.data))
           let rightId = rightChild.getAttribute('data-element_id');
-          let elIndex = this.elIndexOf(rightChild, leftElChilds)
+          let elIndex = this.elIndexOf(rightChild, leftEl.childNodes)
           if (elIndex === -1) {
-            rightEl.remove()
+            rightChild.remove();
+            if (rightElChilds[index].constructor.name === 'Text' && rightElChilds[index - 1] && rightElChilds[index - 1].constructor.name === 'Text') {
+              rightElChilds[index - 1].data += rightElChilds[index].data;
+              rightElChilds[index].remove()
+            }
+
             index--;
             continue;
           }
-          else
+          else if (rightElChilds[elIndex] !== rightChild)
             rightElChilds[elIndex].before(rightChild);
 
 
@@ -655,13 +668,19 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
           let rightId = rightChild.getAttribute('data-element_id');
           if (rightId !== leftId) {
 
-            let elIndex = this.elIndexOf(rightChild, leftElChilds)
+            let elIndex = this.elIndexOf(rightChild, leftEl.childNodes)
             if (elIndex === -1) {
-              rightEl.remove()
+              rightChild.remove()
+              if (rightElChilds[index].constructor.name === 'Text' && rightElChilds[index - 1] && rightElChilds[index - 1].constructor.name === 'Text') {
+                rightElChilds[index - 1].data += rightElChilds[index].data;
+                rightElChilds[index].remove()
+              }
+
+
               index--;
               continue;
             }
-            else
+            else if (rightElChilds[elIndex] !== rightChild)
               rightElChilds[elIndex].before(rightChild);
           }
         }
@@ -669,7 +688,6 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
 
     }
-
 
     // if () {
 
@@ -749,8 +767,63 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
   while (rightElChilds[index]) {
     rightElChilds[index].remove()
   }
+  console.log('>>>>>>>>>', this.isDomEqul(leftEl, rightEl))
+
+}
 
 
+domHtmlManipulator.prototype.isElEqual = function isElEqual(leftEl, rightEl) {
+  if (leftEl.tagName != rightEl.tagName)
+    return false;
+
+
+  if (leftEl.attributes.length != rightEl.attributes.length)
+    return false;
+
+
+  for (let leftAtt of leftEl.attributes) {
+    if (!rightEl.attributes[leftAtt.name])
+      return false;
+    else if (rightEl.attributes[leftAtt.name].value != leftAtt.value)
+      return false;
+  }
+  return true;
+}
+
+
+domHtmlManipulator.prototype.isDomEqul = function isDomEqul(leftEl, rightEl) {
+  const rightElChilds = rightEl.childNodes
+  const leftElChilds = leftEl.childNodes;
+
+  for (let i = 0; i < leftElChilds.length; i++) {
+    if (leftElChilds[i].constructor.name == "Text") {
+      if (rightElChilds[i]) {
+        if (rightElChilds[i].constructor.name == "Text") {
+          if (rightElChilds[i].data !== leftElChilds[i])
+            return false;
+        }
+        else
+          return false;
+      }
+      else
+        return false;
+    }
+    else {
+      if (rightElChilds[i]) {
+        if (rightElChilds[i].constructor.name != "Text") {
+          if (!this.isElEqual(leftElChilds[i], rightElChilds[i]))
+            return false;
+        }
+        else
+          return false;
+      }
+      else
+        return false;
+
+
+    }
+  }
+  return true;
 }
 
 domHtmlManipulator.prototype.renameTagName = function renameTagName(leftEl, rightEl) {
