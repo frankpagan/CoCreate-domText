@@ -590,9 +590,9 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
 }
 
 function isTextOrEl(el) {
-  if (el instanceof window.Text)
+  if (el.constructor.name === 'Text')
     return true
-  else if (el instanceof window.Element)
+  else if (el.constructor.name.indexOf('Element'))
     return false
 }
 
