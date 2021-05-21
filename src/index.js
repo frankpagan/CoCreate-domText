@@ -201,18 +201,21 @@ domHtmlManipulator.prototype.insertAdjacentElement =
     switch (position) {
       case "beforebegin":
       case "afterbegin":
-        this.removeCallback(pos);
-        insertPos = (position == 'beforebegin' ? this.tagStPos : this.tagStClAfPos) - (pos.to - pos.from);
-        return this.addCallback({ value: elementValue, position: insertPos })
+        insertPos = (position == 'beforebegin' ? this.tagStPos : this.tagStClAfPos);
+        break;
       case "beforeend":
       case "afterend":
         if (!this.findClosingTag())
           throw new Error('closing tag could not be found');
-        this.removeCallback(pos);
-        insertPos = (position == 'beforeend' ? this.tagEnPos : this.tagEnClAfPos) - (pos.to - pos.from);
-        return this.addCallback({ value: elementValue, position: insertPos })
+        insertPos = (position == 'beforeend' ? this.tagEnPos : this.tagEnClAfPos);
+        break;
     }
-
+    if (pos) {
+      if (pos.to < insertPos)
+        insertPos = insertPos - (pos.to - pos.from);
+      this.removeCallback(pos);
+    }
+    this.addCallback({ value: elementValue, position: insertPos })
 
 
   };
@@ -690,7 +693,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
               rightChild.before(leftChild.cloneNode(true))
 
             // new element has been added we should process the new element again at index
-            
+
             rightChild = rightElChilds[index];
             rightId = rightChild.getAttribute('data-element_id');
 
