@@ -1,3 +1,10 @@
+## [1.0.1](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.0.0...v1.0.1) (2021-05-24)
+
+
+### Bug Fixes
+
+* insertAdjacentElement on no pos ([843a38c](https://github.com/CoCreate-app/CoCreate-domText/commit/843a38cfff9fdb508abffbe5f0594710f8316628))
+
 # 1.0.0 (2021-05-11)
 
 
