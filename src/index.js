@@ -537,6 +537,23 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
   this.changeStr = changeStr;
   this.removeLength = removeLength;
   this.pos = pos;
+  //sometimes html is empty when remove everything
+  if (!this.html.trim()) {
+    // todo: crdt can provide insert and delete in the same deltaChange
+    this.domHtml.innerHTML = "";
+    this.isLastStateEmpty = true;
+    return;
+  }
+
+
+  if (this.isLastStateEmpty) {
+    let doc = new DOMParser().parseFromString(this.html, "text/html");
+    this.domHtml.replaceChildren(...doc.documentElement.children)
+    this.isLastStateEmpty = false;
+    return;
+  }
+
+
 
   try {
     if (!this.findElByPos(pos))
@@ -743,7 +760,7 @@ domHtmlManipulator.prototype.renameTagName = function renameTagName(leftEl, righ
 
 }
 
-
+// overwrite except data-element_id
 domHtmlManipulator.prototype.overwriteAttributes = function overwriteAttributes(leftEl, rightEl) {
 
   for (let leftAtt of leftEl.attributes) {
