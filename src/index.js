@@ -532,8 +532,6 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
     throw new Error('position is out of range');
 
 
-
-
   this.changeStr = changeStr;
   this.removeLength = removeLength;
   this.pos = pos;
@@ -554,10 +552,11 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
   }
 
 
-
   try {
-    if (!this.findElByPos(pos))
-      throw new Error("change doesn't represent in a new element ");
+   this.findElByPos(pos) ? this.rebuildByElement() : this.rebuildByDocument()
+    
+    // if (!)
+    // throw new Error("change doesn't represent in a new element ");
   }
   catch (err) {
     throw new Error("element can not be found")
@@ -566,22 +565,26 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
   }
 
 
+}
 
-  let newChangeInEl = this.html.substring(this.tagStPos, this.tagEnClAfPos)
+domHtmlManipulator.prototype.rebuildByElement = function rebuildByElement(id, elList, from) {
 
+  let newChangeInEl = 
+  this.html.substring(this.tagStPos, this.tagEnClAfPos) ;
+ if(!newChangeInEl) return;
   // todo: is this needed?
   // context = this.getContext(pos - removeLength, pos);
   // if (!context)
   //   return console.error('breaking change no dom change')
 
+  let [editorEl, ...rest] =
+  this.parseAll(newChangeInEl) 
 
-
-
-  let [editorEl, ...rest] = this.parseAll(newChangeInEl);
   if (!editorEl)
     throw new Error('element not parseable')
 
-
+  for (let el of rest)
+    realDomTarget.insertAdjacentElement('afterend', el)
 
   // replacing ="" and all space to compare in more real situation
   // let cleaned = editorEl.outerHTML.replace(extraMeta, '').toLowerCase();
@@ -589,22 +592,29 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
   // if (cleaned != cleaned2)
   //   return console.warn('breaking change');
 
-  let realDomTarget = this.domHtml.querySelector(`[data-element_id="${this.target}"]`);
-  if (!realDomTarget)
-    return console.warn('target not found on real dom');
+  let realDomTarget =
+    this.domHtml.querySelector(`[data-element_id="${this.target}"]`) ;
 
-  for (let el of rest)
-    realDomTarget.insertAdjacentElement('afterend', el)
+
 
   // todo: recognize html tag either by nesting rebuildDom or by itself as a selector as html is unique
   this.rebuildDom(editorEl, realDomTarget)
 
 
 
+}
 
+domHtmlManipulator.prototype.rebuildByDocument = function rebuildByDocument(id, elList, from) {
 
+  let editorEl = new DOMParser().parseFromString(this.html, "text/html");
+  if (!editorEl)
+    throw new Error('element not parseable')
+
+  this.rebuildDom(editorEl.documentElement, this.domHtml)
 
 }
+
+
 
 function isTextOrEl(el) {
   if (el.constructor.name === 'Text')
@@ -629,12 +639,12 @@ domHtmlManipulator.prototype.elIndexOf = function elIndexOf(id, elList, from) {
 domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
 
-  if (leftEl.tagName !== rightEl.tagName) {
+  if (rightEl.tagName && leftEl.tagName !== rightEl.tagName) {
     this.renameTagName(leftEl, rightEl);
     // todo: we should break here in theory
   }
 
-  this.overwriteAttributes(leftEl, rightEl);
+  rightEl.tagName && this.overwriteAttributes(leftEl, rightEl);
   // todo: if any change we should break here too
 
 
