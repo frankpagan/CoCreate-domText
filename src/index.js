@@ -535,36 +535,35 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
   this.changeStr = changeStr;
   this.removeLength = removeLength;
   this.pos = pos;
-  //sometimes html is empty when remove everything
-  if (!this.html.trim()) {
-    // todo: crdt can provide insert and delete in the same deltaChange
-    this.domHtml.innerHTML = "";
-    this.isLastStateEmpty = true;
-    return;
-  }
-
-
-  if (this.isLastStateEmpty) {
-    let doc = new DOMParser().parseFromString(this.html, "text/html");
-    this.domHtml.replaceChildren(...doc.documentElement.children)
-    this.domHtml.querySelectorAll('script').forEach(el => {
-      el.replaceWith(cloneByCreate(el));
-    })
-    this.isLastStateEmpty = false;
-    return;
-  }
-
 
   try {
+
+    //sometimes html is empty when remove everything
+    if (!this.html.trim()) {
+      // todo: crdt can provide insert and delete in the same deltaChange
+      this.domHtml.innerHTML = "";
+      this.isLastStateEmpty = true;
+      return;
+    }
+
+
+    if (this.isLastStateEmpty) {
+      let doc = new DOMParser().parseFromString(this.html, "text/html");
+      this.domHtml.replaceChildren(...doc.documentElement.children)
+      this.domHtml.querySelectorAll('script').forEach(el => {
+        el.replaceWith(cloneByCreate(el));
+      })
+      this.isLastStateEmpty = false;
+      return;
+    }
+
+
+
     this.findElByPos(pos) ? this.rebuildByElement() : this.rebuildByDocument()
 
-    // if (!)
-    // throw new Error("change doesn't represent in a new element ");
   }
   catch (err) {
-    throw new Error("element can not be found")
-    // throw new Error("change doesn't represent in a new element ");
-
+    throw new Error("domText failed to apply the change");
   }
 
 
@@ -582,9 +581,6 @@ domHtmlManipulator.prototype.rebuildByElement = function rebuildByElement(id, el
 
   let [editorEl, ...rest] =
   this.parseAll(newChangeInEl)
-
-  if (!editorEl)
-    throw new Error('element not parseable')
 
   for (let el of rest)
     realDomTarget.insertAdjacentElement('afterend', el)
@@ -610,8 +606,7 @@ domHtmlManipulator.prototype.rebuildByElement = function rebuildByElement(id, el
 domHtmlManipulator.prototype.rebuildByDocument = function rebuildByDocument(id, elList, from) {
 
   let editorEl = new DOMParser().parseFromString(this.html, "text/html");
-  if (!editorEl)
-    throw new Error('element not parseable')
+
 
   this.rebuildDom(editorEl.documentElement, this.domHtml)
 
@@ -710,7 +705,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
         }
       }
       else {
-      
+
 
         if (rightIsText) {
           rightChild.before(cloneByCreate(leftChild));
@@ -721,7 +716,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
           let rightId = rightChild.getAttribute('data-element_id');
           let leftId = leftChild.getAttribute('data-element_id');
 
-          if ( leftId && rightId !== leftId ) {
+          if (leftId && rightId !== leftId) {
             let elIndex = elIndexOf(leftId, rightEl.childNodes);
 
             if (elIndex !== -1)
@@ -734,7 +729,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
             rightChild = rightElChilds[index];
             rightId = rightChild.getAttribute('data-element_id');
             elIndex = elIndexOf(rightId, rightEl.childNodes)
-            
+
             if (elIndex === -1) {
               rightChild.remove()
               if (isTextOrEl(rightElChilds[index]) === true && rightElChilds[index - 1] && isTextOrEl(rightElChilds[index - 1]) === true) {
@@ -771,7 +766,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
 
 
- function renameTagName(leftEl, rightEl) {
+function renameTagName(leftEl, rightEl) {
 
   let newRightEl = document.createElement(leftEl.tagName);
   assignAttributes(leftEl, newRightEl);
@@ -780,16 +775,13 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
 }
 
+
 // overwrite except data-element_id
- function assignAttributes(leftEl, rightEl) {
+function assignAttributes(leftEl, rightEl) {
 
   for (let leftAtt of leftEl.attributes) {
     if (!rightEl.attributes[leftAtt.name] || rightEl.attributes[leftAtt.name].value !== leftAtt.value)
-      try {
-
-          rightEl.setAttribute(leftAtt.name, leftAtt.value)
-      }
-    catch (err) {}
+      rightEl.setAttribute(leftAtt.name, leftAtt.value)
   }
 
   if (leftEl.attributes.length !== rightEl.attributes.length) {
