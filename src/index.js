@@ -626,7 +626,7 @@ function isTextOrEl(el) {
     return false
 }
 
-domHtmlManipulator.prototype.elIndexOf = function elIndexOf(id, elList, from) {
+function elIndexOf(id, elList, from) {
   for (let i = 0; i < elList.length; i++) {
     if (isTextOrEl(elList[i]) === false && elList[i].getAttribute('data-element_id') == id)
       return i;
@@ -640,7 +640,7 @@ domHtmlManipulator.prototype.elIndexOf = function elIndexOf(id, elList, from) {
 function cloneByCreate(el) {
   let newEl = document.createElement(el.tagName);
   newEl.innerHTML = el.innerHTML;
-  overwriteAttributes(el, newEl)
+  assignAttributes(el, newEl)
   return newEl;
 }
 
@@ -648,12 +648,12 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
 
   if (rightEl.tagName && leftEl.tagName !== rightEl.tagName) {
-    this.renameTagName(leftEl, rightEl);
+    renameTagName(leftEl, rightEl);
 
     // todo: we should break here in theory
   }
 
-  rightEl.tagName && overwriteAttributes(leftEl, rightEl);
+  rightEl.tagName && assignAttributes(leftEl, rightEl);
   // todo: if any change we should break here too
 
 
@@ -692,7 +692,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
         else {
           rightChild.before(document.createTextNode(leftChild.data))
           let rightId = rightChild.getAttribute('data-element_id');
-          let elIndex = this.elIndexOf(rightId, rightEl.childNodes)
+          let elIndex = elIndexOf(rightId, rightEl.childNodes)
           if (elIndex === -1) {
             rightChild.remove();
             if (isTextOrEl(rightElChilds[index]) === true && rightElChilds[index - 1] && isTextOrEl(rightElChilds[index - 1]) === true) {
@@ -722,7 +722,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
           let leftId = leftChild.getAttribute('data-element_id');
 
           if ( leftId && rightId !== leftId ) {
-            let elIndex = this.elIndexOf(leftId, rightEl.childNodes);
+            let elIndex = elIndexOf(leftId, rightEl.childNodes);
 
             if (elIndex !== -1)
               rightChild.insertAdjacentElement('beforebegin', rightEl.childNodes[elIndex])
@@ -733,7 +733,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
             rightChild = rightElChilds[index];
             rightId = rightChild.getAttribute('data-element_id');
-            elIndex = this.elIndexOf(rightId, rightEl.childNodes)
+            elIndex = elIndexOf(rightId, rightEl.childNodes)
             
             if (elIndex === -1) {
               rightChild.remove()
@@ -771,17 +771,17 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
 
 
-domHtmlManipulator.prototype.renameTagName = function renameTagName(leftEl, rightEl) {
+ function renameTagName(leftEl, rightEl) {
 
   let newRightEl = document.createElement(leftEl.tagName);
-  overwriteAttributes(leftEl, newRightEl);
+  assignAttributes(leftEl, newRightEl);
   newRightEl.replaceChildren(...leftEl.childNodes)
   rightEl.replaceWith(newRightEl)
 
 }
 
 // overwrite except data-element_id
- function overwriteAttributes(leftEl, rightEl) {
+ function assignAttributes(leftEl, rightEl) {
 
   for (let leftAtt of leftEl.attributes) {
     if (!rightEl.attributes[leftAtt.name] || rightEl.attributes[leftAtt.name].value !== leftAtt.value)
