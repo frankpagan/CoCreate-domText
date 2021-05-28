@@ -553,8 +553,8 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
 
 
   try {
-   this.findElByPos(pos) ? this.rebuildByElement() : this.rebuildByDocument()
-    
+    this.findElByPos(pos) ? this.rebuildByElement() : this.rebuildByDocument()
+
     // if (!)
     // throw new Error("change doesn't represent in a new element ");
   }
@@ -569,16 +569,16 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
 
 domHtmlManipulator.prototype.rebuildByElement = function rebuildByElement(id, elList, from) {
 
-  let newChangeInEl = 
-  this.html.substring(this.tagStPos, this.tagEnClAfPos) ;
- if(!newChangeInEl) return;
+  let newChangeInEl =
+    this.html.substring(this.tagStPos, this.tagEnClAfPos);
+  if (!newChangeInEl) return;
   // todo: is this needed?
   // context = this.getContext(pos - removeLength, pos);
   // if (!context)
   //   return console.error('breaking change no dom change')
 
   let [editorEl, ...rest] =
-  this.parseAll(newChangeInEl) 
+  this.parseAll(newChangeInEl)
 
   if (!editorEl)
     throw new Error('element not parseable')
@@ -593,7 +593,7 @@ domHtmlManipulator.prototype.rebuildByElement = function rebuildByElement(id, el
   //   return console.warn('breaking change');
 
   let realDomTarget =
-    this.domHtml.querySelector(`[data-element_id="${this.target}"]`) ;
+    this.domHtml.querySelector(`[data-element_id="${this.target}"]`);
 
 
 
