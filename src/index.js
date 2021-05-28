@@ -649,6 +649,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
   if (rightEl.tagName && leftEl.tagName !== rightEl.tagName) {
     this.renameTagName(leftEl, rightEl);
+
     // todo: we should break here in theory
   }
 
@@ -712,7 +713,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
       
 
         if (rightIsText) {
-          rightChild.before(leftChild.cloneNode(true));
+          rightChild.before(cloneByCreate(leftChild));
           rightChild.remove();
         }
         else {
@@ -726,7 +727,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
             if (elIndex !== -1)
               rightChild.insertAdjacentElement('beforebegin', rightEl.childNodes[elIndex])
             else
-              rightChild.before(leftChild.cloneNode(true))
+              rightChild.before(cloneByCreate(leftChild))
 
             // new element has been added we should process the new element again at index
 
