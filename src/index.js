@@ -701,7 +701,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
         }
       }
       else {
-        let leftId = leftChild.getAttribute('data-element_id');
+      
 
         if (rightIsText) {
           rightChild.before(leftChild.cloneNode(true));
@@ -710,8 +710,9 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
         else {
           // teleport element if exist otherwise create it
           let rightId = rightChild.getAttribute('data-element_id');
+          let leftId = leftChild.getAttribute('data-element_id');
 
-          if (rightId !== leftId) {
+          if ( leftId && rightId !== leftId ) {
             let elIndex = this.elIndexOf(leftId, rightEl.childNodes);
 
             if (elIndex !== -1)
@@ -723,8 +724,8 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
             rightChild = rightElChilds[index];
             rightId = rightChild.getAttribute('data-element_id');
-
             elIndex = this.elIndexOf(rightId, rightEl.childNodes)
+            
             if (elIndex === -1) {
               rightChild.remove()
               if (isTextOrEl(rightElChilds[index]) === true && rightElChilds[index - 1] && isTextOrEl(rightElChilds[index - 1]) === true) {
