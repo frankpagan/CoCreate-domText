@@ -786,7 +786,7 @@ domHtmlManipulator.prototype.renameTagName = function renameTagName(leftEl, righ
   for (let leftAtt of leftEl.attributes) {
     if (!rightEl.attributes[leftAtt.name] || rightEl.attributes[leftAtt.name].value !== leftAtt.value)
       try {
-        if (leftAtt.name != 'data-element_id')
+
           rightEl.setAttribute(leftAtt.name, leftAtt.value)
       }
     catch (err) {}
@@ -795,7 +795,7 @@ domHtmlManipulator.prototype.renameTagName = function renameTagName(leftEl, righ
   if (leftEl.attributes.length !== rightEl.attributes.length) {
     for (let i = 0, len = rightEl.attributes.length; i < len; i++) {
       let rightAtt = rightEl.attributes[i];
-      if (!leftEl.attributes[rightAtt.name] && rightAtt.name != 'data-element_id') {
+      if (!leftEl.attributes[rightAtt.name]) {
         rightEl.removeAttribute(rightAtt.name)
         i--, len--;
       }
