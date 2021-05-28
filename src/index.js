@@ -639,9 +639,9 @@ domHtmlManipulator.prototype.elIndexOf = function elIndexOf(id, elList, from) {
 
 function cloneByCreate(el) {
   let newEl = document.createElement(el.tagName);
-  this.overwriteAttributes(el, newEl)
+  newEl.innerHTML = el.innerHTML;
+  overwriteAttributes(el, newEl)
   return newEl;
-
 }
 
 domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
@@ -653,7 +653,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
     // todo: we should break here in theory
   }
 
-  rightEl.tagName && this.overwriteAttributes(leftEl, rightEl);
+  rightEl.tagName && overwriteAttributes(leftEl, rightEl);
   // todo: if any change we should break here too
 
 
@@ -774,14 +774,14 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 domHtmlManipulator.prototype.renameTagName = function renameTagName(leftEl, rightEl) {
 
   let newRightEl = document.createElement(leftEl.tagName);
-  this.overwriteAttributes(leftEl, newRightEl);
+  overwriteAttributes(leftEl, newRightEl);
   newRightEl.replaceChildren(...leftEl.childNodes)
   rightEl.replaceWith(newRightEl)
 
 }
 
 // overwrite except data-element_id
-domHtmlManipulator.prototype.overwriteAttributes = function overwriteAttributes(leftEl, rightEl) {
+ function overwriteAttributes(leftEl, rightEl) {
 
   for (let leftAtt of leftEl.attributes) {
     if (!rightEl.attributes[leftAtt.name] || rightEl.attributes[leftAtt.name].value !== leftAtt.value)
