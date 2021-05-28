@@ -547,6 +547,9 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
   if (this.isLastStateEmpty) {
     let doc = new DOMParser().parseFromString(this.html, "text/html");
     this.domHtml.replaceChildren(...doc.documentElement.children)
+    this.domHtml.querySelectorAll('script').forEach(el => {
+      el.replaceWith(cloneByCreate(el));
+    })
     this.isLastStateEmpty = false;
     return;
   }
@@ -634,7 +637,12 @@ domHtmlManipulator.prototype.elIndexOf = function elIndexOf(id, elList, from) {
 
 }
 
+function cloneByCreate(el) {
+  let newEl = document.createElement(el.tagName);
+  this.overwriteAttributes(el, newEl)
+  return newEl;
 
+}
 
 domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
