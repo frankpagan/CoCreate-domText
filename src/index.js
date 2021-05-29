@@ -572,7 +572,7 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
 domHtmlManipulator.prototype.rebuildByElement = function rebuildByElement(id, elList, from) {
 
   let newChangeInEl =
-    this.html.substring(this.tagStPos, this.tagEnClAfPos);
+    this.html.substring(this.tagStPos, this.tagEnClAfPos || this.tagStClAfPos);
   if (!newChangeInEl) return;
   // todo: is this needed?
   // context = this.getContext(pos - removeLength, pos);
