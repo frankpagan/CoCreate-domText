@@ -662,7 +662,7 @@ function insertAdajcentClone(target, element, position) {
   else
     target.insertAdjacentElement(position, element.cloneNode(true))
 }
-domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
+domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, flat, cloneByCreate = true) {
 
 
   if (rightEl.tagName && leftEl.tagName !== rightEl.tagName) {
@@ -673,7 +673,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
   if (rightEl.tagName) {
 
-    if (rightEl.tagName === "SCRIPT" && leftEl.src !== rightEl.src)
+    if (rightEl.tagName === "SCRIPT" && leftEl.src !== rightEl.src && cloneByCreate)
       rightEl.replaceWith(cloneByCreate(leftEl))
     else
       assignAttributes(leftEl, rightEl);
@@ -681,7 +681,8 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
   // todo: if any change we should break here too
 
-
+  if (flat)
+    return;
   const rightElChilds = rightEl.childNodes
   const leftElChilds = Array.from(leftEl.childNodes);
 
@@ -777,7 +778,8 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
           }
           else {
-            this.rebuildDom.call(this, leftChild, rightChild)
+
+            this.rebuildDom.call(this, leftChild, rightChild, true, false)
           }
         }
       }
