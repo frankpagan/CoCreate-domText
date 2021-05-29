@@ -662,9 +662,9 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
     // todo: we should break here in theory
   }
 
-
   if (rightEl.tagName) {
-    if (leftEl.tagName === "SCRIPT")
+
+    if (rightEl.tagName === "SCRIPT" && leftEl.src !== rightEl.src)
       rightEl.replaceWith(cloneByCreate(leftEl))
     else
       assignAttributes(leftEl, rightEl);
