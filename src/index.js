@@ -779,7 +779,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, f
           }
           else {
 
-            this.rebuildDom.call(this, leftChild, rightChild, true, false)
+            this.rebuildDom.call(this, leftChild, rightChild, false, false)
           }
         }
       }
