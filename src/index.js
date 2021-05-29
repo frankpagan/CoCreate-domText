@@ -741,10 +741,10 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
           if (leftId && rightId !== leftId) {
             let elIndex = elIndexOf(leftId, rightEl.childNodes);
 
-            if (elIndex !== -1)
-              rightChild.insertAdjacentElement('beforebegin', rightEl.childNodes[elIndex])
-            else
+            if (elIndex === -1)
               insertAdajcentClone(rightChild, leftChild, 'beforebegin')
+            else
+              rightChild.insertAdjacentElement('beforebegin', rightEl.childNodes[elIndex])
 
 
             // new element has been added we should process the new element again at index
