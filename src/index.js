@@ -648,7 +648,14 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
     // todo: we should break here in theory
   }
 
-  rightEl.tagName && assignAttributes(leftEl, rightEl);
+
+  if (rightEl.tagName) {
+    if (leftEl.tagName === "SCRIPT")
+      rightEl.replaceWith(cloneByCreate(leftEl))
+    else
+      assignAttributes(leftEl, rightEl);
+  }
+
   // todo: if any change we should break here too
 
 
@@ -668,8 +675,12 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
     if (!rightChild) {
       if (leftIsText === true)
         rightEl.insertAdjacentText('beforeend', leftChild.data)
-      else if (leftIsText === false)
-        rightEl.insertAdjacentElement('beforeend', leftChild.cloneNode(true))
+      else if (leftIsText === false) {
+        if (leftChild.tagName === "SCRIPT")
+          rightEl.insertAdjacentElement('beforeend', cloneByCreate(leftChild))
+        else
+          rightEl.insertAdjacentElement('beforeend', leftChild.cloneNode(true))
+      }
       else
         continue;
     }
@@ -687,19 +698,23 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
         else {
           rightChild.before(document.createTextNode(leftChild.data))
           let rightId = rightChild.getAttribute('data-element_id');
-          let elIndex = elIndexOf(rightId, rightEl.childNodes)
-          if (elIndex === -1) {
-            rightChild.remove();
-            if (isTextOrEl(rightElChilds[index]) === true && rightElChilds[index - 1] && isTextOrEl(rightElChilds[index - 1]) === true) {
-              rightElChilds[index - 1].data += rightElChilds[index].data;
-              rightElChilds[index].remove()
+
+          if (rightId) {
+            let elIndex = elIndexOf(rightId, rightEl.childNodes)
+            if (elIndex === -1) {
+              rightChild.remove();
+              if (isTextOrEl(rightElChilds[index]) === true && rightElChilds[index - 1] && isTextOrEl(rightElChilds[index - 1]) === true) {
+                rightElChilds[index - 1].data += rightElChilds[index].data;
+                rightElChilds[index].remove()
+              }
+
+              index--;
+              continue;
             }
 
-            index--;
-            continue;
+            else if (rightElChilds[elIndex] && rightElChilds[elIndex] !== rightChild)
+              rightElChilds[elIndex].before(rightChild);
           }
-          else if (rightElChilds[elIndex] && rightElChilds[elIndex] !== rightChild)
-            rightElChilds[elIndex].before(rightChild);
 
 
         }
@@ -708,7 +723,11 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
 
         if (rightIsText) {
-          rightChild.before(cloneByCreate(leftChild));
+          if (leftChild.tagName === "SCRIPT")
+            rightChild.before(cloneByCreate(leftChild));
+          else
+            rightChild.before(leftChild.cloneNode(true));
+
           rightChild.remove();
         }
         else {
@@ -722,27 +741,35 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
             if (elIndex !== -1)
               rightChild.insertAdjacentElement('beforebegin', rightEl.childNodes[elIndex])
             else
-              rightChild.before(cloneByCreate(leftChild))
+            if (leftChild.tagName === "SCRIPT")
+              rightChild.before(cloneByCreate(leftChild));
+            else
+              rightChild.before(leftChild.cloneNode(true));
 
             // new element has been added we should process the new element again at index
 
             rightChild = rightElChilds[index];
             rightId = rightChild.getAttribute('data-element_id');
-            elIndex = elIndexOf(rightId, rightEl.childNodes)
+            if (rightId) {
+              elIndex = elIndexOf(rightId, rightEl.childNodes)
 
-            if (elIndex === -1) {
-              rightChild.remove()
-              if (isTextOrEl(rightElChilds[index]) === true && rightElChilds[index - 1] && isTextOrEl(rightElChilds[index - 1]) === true) {
-                rightElChilds[index - 1].data += rightElChilds[index].data;
-                rightElChilds[index].remove()
+              if (elIndex === -1) {
+                rightChild.remove()
+                if (isTextOrEl(rightElChilds[index]) === true && rightElChilds[index - 1] && isTextOrEl(rightElChilds[index - 1]) === true) {
+                  rightElChilds[index - 1].data += rightElChilds[index].data;
+                  rightElChilds[index].remove()
+                }
+
+
+                index--;
+                continue;
               }
+              else if (rightElChilds[elIndex] && rightElChilds[elIndex] !== rightChild)
+                rightElChilds[elIndex].before(rightChild);
 
-
-              index--;
-              continue;
             }
-            else if (rightElChilds[elIndex] && rightElChilds[elIndex] !== rightChild)
-              rightElChilds[elIndex].before(rightChild);
+
+
           }
           else {
             this.rebuildDom.call(this, leftChild, rightChild)
