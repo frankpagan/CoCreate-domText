@@ -563,7 +563,7 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
 
   }
   catch (err) {
-    throw new Error("domText failed to apply the change");
+    throw new Error("domText failed to apply the change " + err.message, err.name);
   }
 
 
