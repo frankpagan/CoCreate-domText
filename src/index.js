@@ -646,6 +646,13 @@ function mergeTextNode(textNode1, textNode2) {
   }
 }
 
+
+function insertAdajcentClone(target, element, position) {
+  if (element.tagName === "SCRIPT")
+    target.insertAdjacentElement(position, cloneByCreate(element))
+  else
+    target.insertAdjacentElement(position, element.cloneNode(true))
+}
 domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
 
@@ -682,12 +689,8 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
     if (!rightChild) {
       if (leftIsText === true)
         rightEl.insertAdjacentText('beforeend', leftChild.data)
-      else if (leftIsText === false) {
-        if (leftChild.tagName === "SCRIPT")
-          rightEl.insertAdjacentElement('beforeend', cloneByCreate(leftChild))
-        else
-          rightEl.insertAdjacentElement('beforeend', leftChild.cloneNode(true))
-      }
+      else if (leftIsText === false)
+        insertAdajcentClone(rightEl, leftChild, 'beforeend')
       else
         continue;
     }
@@ -727,11 +730,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
 
         if (rightIsText) {
-          if (leftChild.tagName === "SCRIPT")
-            rightChild.before(cloneByCreate(leftChild));
-          else
-            rightChild.before(leftChild.cloneNode(true));
-
+          insertAdajcentClone(rightChild, leftChild, 'beforebegin')
           rightChild.remove();
         }
         else {
@@ -745,10 +744,8 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
             if (elIndex !== -1)
               rightChild.insertAdjacentElement('beforebegin', rightEl.childNodes[elIndex])
             else
-            if (leftChild.tagName === "SCRIPT")
-              rightChild.before(cloneByCreate(leftChild));
-            else
-              rightChild.before(leftChild.cloneNode(true));
+              insertAdajcentClone(rightChild, leftChild, 'beforebegin')
+
 
             // new element has been added we should process the new element again at index
 
