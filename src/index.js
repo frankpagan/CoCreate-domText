@@ -646,6 +646,15 @@ function mergeTextNode(textNode1, textNode2) {
   }
 }
 
+function textInsertAdajcentClone(target, element, position) {
+
+  let func = position === "beforebegin" ? target.before : target.after;
+  if (element.tagName === "SCRIPT")
+    func.call(target, cloneByCreate(element))
+  else
+    func.call(target, element.cloneNode(true))
+}
+
 
 function insertAdajcentClone(target, element, position) {
   if (element.tagName === "SCRIPT")
@@ -730,7 +739,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
 
         if (rightIsText) {
-          insertAdajcentClone(rightChild, leftChild, 'beforebegin')
+          textInsertAdajcentClone(rightChild, leftChild, 'beforebegin')
           rightChild.remove();
         }
         else {
