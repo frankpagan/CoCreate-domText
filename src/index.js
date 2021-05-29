@@ -639,6 +639,13 @@ function cloneByCreate(el) {
   return newEl;
 }
 
+function mergeTextNode(textNode1, textNode2) {
+  if (isTextOrEl(textNode1) === true && textNode2 && isTextOrEl(textNode2) === true) {
+    textNode2.data += textNode1.data;
+    textNode1.remove()
+  }
+}
+
 domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
 
@@ -703,11 +710,8 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
             let elIndex = elIndexOf(rightId, rightEl.childNodes)
             if (elIndex === -1) {
               rightChild.remove();
-              if (isTextOrEl(rightElChilds[index]) === true && rightElChilds[index - 1] && isTextOrEl(rightElChilds[index - 1]) === true) {
-                rightElChilds[index - 1].data += rightElChilds[index].data;
-                rightElChilds[index].remove()
-              }
 
+              mergeTextNode(rightElChilds[index], rightElChilds[index - 1]);
               index--;
               continue;
             }
@@ -755,12 +759,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl) {
 
               if (elIndex === -1) {
                 rightChild.remove()
-                if (isTextOrEl(rightElChilds[index]) === true && rightElChilds[index - 1] && isTextOrEl(rightElChilds[index - 1]) === true) {
-                  rightElChilds[index - 1].data += rightElChilds[index].data;
-                  rightElChilds[index].remove()
-                }
-
-
+                mergeTextNode(rightElChilds[index], rightElChilds[index - 1]);
                 index--;
                 continue;
               }
