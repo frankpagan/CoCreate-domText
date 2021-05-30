@@ -664,6 +664,9 @@ function insertAdajcentClone(target, element, position) {
   else
     target.insertAdjacentElement(position, element.cloneNode(true))
 }
+
+// todo: optimize but not doing assignAttributes if the editorEl innerHtml changed
+// todo: optimize: skip after you canged rightDom as one single unit as changes to textArea happens in one place
 domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, flat, cloneByCreate = true) {
 
 
