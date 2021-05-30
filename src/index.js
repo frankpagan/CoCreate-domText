@@ -820,7 +820,14 @@ function assignAttributes(leftEl, rightEl) {
 
   for (let leftAtt of leftEl.attributes) {
     if (!rightEl.attributes[leftAtt.name] || rightEl.attributes[leftAtt.name].value !== leftAtt.value)
+    try{
       rightEl.setAttribute(leftAtt.name, leftAtt.value)
+      
+    }catch(err)
+    {
+      // <st is valid based on w3 but setAttribute throw exception
+      // https://www.w3.org/TR/2011/WD-html5-20110525/syntax.html#attributes-0
+    }
   }
 
   if (leftEl.attributes.length !== rightEl.attributes.length) {
