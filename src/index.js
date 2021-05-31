@@ -681,7 +681,7 @@ function insertAdajcentClone(target, element, position) {
 
 // todo: optimize but not doing assignAttributes if the editorEl innerHtml changed
 // todo: optimize: skip after you canged rightDom as one single unit as changes to textArea happens in one place
-domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, flat, cloneByCreate = true) {
+domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, flat ) {
 
 
   if (rightEl.tagName && leftEl.tagName !== rightEl.tagName) {
@@ -692,7 +692,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, f
 
   if (rightEl.tagName) {
 
-    if (rightEl.tagName === "SCRIPT" && leftEl.src !== rightEl.src && cloneByCreate)
+    if (rightEl.tagName === "SCRIPT" && leftEl.src !== rightEl.src )
       rightEl.replaceWith(cloneByCreate(leftEl))
     else
       assignAttributes(leftEl, rightEl);
@@ -798,7 +798,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, f
           }
           else {
 
-            this.rebuildDom.call(this, leftChild, rightChild, false, false)
+            this.rebuildDom.call(this, leftChild, rightChild, flat)
           }
         }
       }
