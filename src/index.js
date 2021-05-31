@@ -555,6 +555,20 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
       this.domHtml.querySelectorAll('script').forEach(el => {
         el.replaceWith(cloneByCreate(el));
       })
+      let docc = this.domHtml.ownerDocument;
+      let win = docc.defaultView;
+      for (let script of docc.querySelectorAll('script')) {
+        if (!script.hasAttribute('src')) break;
+        let newScript = docc.createElement('script');
+        newScript.setAttribute('src', script.getAttribute('src'))
+        script.insertAdjacentElement('afterend', newScript)
+        script.remove()
+      }
+      // setTimeout(() => {
+      //   win.dispatchEvent(new Event("DOMContentLoaded", { "bubbles": true, "cancelable": false }))
+      //   win.dispatchEvent(new Event("load", { "bubbles": true, "cancelable": false }))
+      // }, 10000)
+      
       this.isLastStateEmpty = false;
       return;
     }
