@@ -702,10 +702,13 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, f
 
   if (flat)
     return;
+    
   const rightElChilds = rightEl.childNodes
   const leftElChilds = Array.from(leftEl.childNodes);
-
-
+  
+  if(leftEl.tagName === "HEAD" && !leftElChilds.length)
+    return;
+    
   let index = 0,
     len = leftElChilds.length;
   for (; index < len; index++) {
