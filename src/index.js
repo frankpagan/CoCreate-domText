@@ -533,47 +533,11 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
   if (pos < 0 || pos > this.html.length)
     throw new Error('position is out of range');
 
-
   this.changeStr = changeStr;
   this.removeLength = removeLength;
   this.pos = pos;
 
   try {
-
-    //sometimes html is empty when remove everything
-    if (!this.html.trim()) {
-      // todo: crdt can provide insert and delete in the same deltaChange
-      this.domHtml.innerHTML = "";
-      this.isLastStateEmpty = true;
-      return;
-    }
-
-
-    if (this.isLastStateEmpty) {
-      let doc = new DOMParser().parseFromString(this.html, "text/html");
-      this.domHtml.replaceChildren(...doc.documentElement.children)
-      this.domHtml.querySelectorAll('script').forEach(el => {
-        el.replaceWith(cloneByCreate(el));
-      })
-      let docc = this.domHtml.ownerDocument;
-      let win = docc.defaultView;
-      for (let script of docc.querySelectorAll('script')) {
-        if (!script.hasAttribute('src')) break;
-        let newScript = docc.createElement('script');
-        newScript.setAttribute('src', script.getAttribute('src'))
-        script.insertAdjacentElement('afterend', newScript)
-        script.remove()
-      }
-      // setTimeout(() => {
-      //   win.dispatchEvent(new Event("DOMContentLoaded", { "bubbles": true, "cancelable": false }))
-      //   win.dispatchEvent(new Event("load", { "bubbles": true, "cancelable": false }))
-      // }, 10000)
-
-      this.isLastStateEmpty = false;
-      return;
-    }
-
-
 
     this.findElByPos(pos) ? this.rebuildByElement() : this.rebuildByDocument()
 
