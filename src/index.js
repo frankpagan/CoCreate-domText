@@ -568,7 +568,7 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
       //   win.dispatchEvent(new Event("DOMContentLoaded", { "bubbles": true, "cancelable": false }))
       //   win.dispatchEvent(new Event("load", { "bubbles": true, "cancelable": false }))
       // }, 10000)
-      
+
       this.isLastStateEmpty = false;
       return;
     }
@@ -665,23 +665,40 @@ function mergeTextNode(textNode1, textNode2) {
 function textInsertAdajcentClone(target, element, position) {
 
   let func = position === "beforebegin" ? target.before : target.after;
-  if (element.tagName === "SCRIPT")
-    func.call(target, cloneByCreate(element))
-  else
-    func.call(target, element.cloneNode(true))
+  // if (element.tagName === "SCRIPT")
+  //   func.call(target, cloneByCreate(element))
+  // else
+  //   func.call(target, element.cloneNode(true))
+  let cloned = element.cloneNode(true);
+  if (cloned.tagName === "SCRIPT")
+    cloned = cloneByCreate(cloned);
+
+  cloned.querySelectorAll('script').forEach(el => {
+    el.replaceWith(cloneByCreate(el))
+  })
+  func.call(target, cloned)
 }
 
 
 function insertAdajcentClone(target, element, position) {
-  if (element.tagName === "SCRIPT")
-    target.insertAdjacentElement(position, cloneByCreate(element))
-  else
-    target.insertAdjacentElement(position, element.cloneNode(true))
+  // if (element.tagName === "SCRIPT")
+  //   target.insertAdjacentElement(position, cloneByCreate(element))
+  // else
+  //   target.insertAdjacentElement(position, element.cloneNode(true))
+
+  let cloned = element.cloneNode(true);
+  if (cloned.tagName === "SCRIPT")
+    cloned = cloneByCreate(cloned);
+  cloned.querySelectorAll('script').forEach(el => {
+    el.replaceWith(cloneByCreate(el))
+  })
+
+  target.insertAdjacentElement(position, cloned)
 }
 
 // todo: optimize but not doing assignAttributes if the editorEl innerHtml changed
 // todo: optimize: skip after you canged rightDom as one single unit as changes to textArea happens in one place
-domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, flat ) {
+domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, flat) {
 
 
   if (rightEl.tagName && leftEl.tagName !== rightEl.tagName) {
@@ -692,7 +709,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, f
 
   if (rightEl.tagName) {
 
-    if (rightEl.tagName === "SCRIPT" && leftEl.src !== rightEl.src )
+    if (rightEl.tagName === "SCRIPT" && leftEl.src !== rightEl.src)
       rightEl.replaceWith(cloneByCreate(leftEl))
     else
       assignAttributes(leftEl, rightEl);
@@ -702,13 +719,13 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, f
 
   if (flat)
     return;
-    
+
   const rightElChilds = rightEl.childNodes
   const leftElChilds = Array.from(leftEl.childNodes);
-  
-  if(leftEl.tagName === "HEAD" && !leftElChilds.length)
+
+  if (leftEl.tagName === "HEAD" && !leftElChilds.length)
     return;
-    
+
   let index = 0,
     len = leftElChilds.length;
   for (; index < len; index++) {
@@ -837,11 +854,11 @@ function assignAttributes(leftEl, rightEl) {
 
   for (let leftAtt of leftEl.attributes) {
     if (!rightEl.attributes[leftAtt.name] || rightEl.attributes[leftAtt.name].value !== leftAtt.value)
-    try{
-      rightEl.setAttribute(leftAtt.name, leftAtt.value)
-      
-    }catch(err)
-    {
+      try {
+        rightEl.setAttribute(leftAtt.name, leftAtt.value)
+
+      }
+    catch (err) {
       // <st is valid based on w3 but setAttribute throw exception
       // https://www.w3.org/TR/2011/WD-html5-20110525/syntax.html#attributes-0
     }
