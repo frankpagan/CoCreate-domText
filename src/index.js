@@ -9,21 +9,21 @@ String.prototype.removeAt = function(index, to) {
   return this.substr(0, index) + this.substr(to);
 };
 
-let spaceAll = "(?:\u{0020}|\u{0009}|\u{000A}|\u{000C}|\u{000D})";
-let space = "(?:\u{0020}|\u{0009})";
-let allAttributeName = `[a-z0-9]+?`;
+let spaceAll = "\u{0020}|\u{0009}|\u{000A}|\u{000C}|\u{000D}";
+let space = "\u{0020}|\u{0009}";
+let allAttributeName = `[a-z0-9-_]+?`;
 let allStyleName = "[^:]+?";
 let allClassName = '[^"]+?';
 
-let sps = `${space}*?`;
-let spa = `${space}+?`;
-let spsa = `${spaceAll}*?`;
-let spaa = `${spaceAll}+?`;
+let sps = `(${space})*?`;
+let spa = `(${space})+?`;
+let spsa = `(${spaceAll})*?`;
+let spaa = `(${spaceAll})+?`;
 let tgs = `(?:<(?<tagName>[a-z0-9]+?))`;
 let getEndTag = tagName => `(?:<(?<isClosing>${sps}\/${sps})?${tagName}${sps})`;
 
 const getRegAttribute = (attributeName) =>
-  `(?:${spa}${attributeName}(?:="[^"]*?")?)`;
+  `(${spa}(?:(?:${attributeName})((?:="[^"]*?")|${space}|>)))`
 const getRegStyle = (styleName) =>
   `(?:${sps}${styleName}${sps}\:${sps}[^\;]+?${sps}\;${sps})`;
 const getRegClassStyle = (styleName) => `(?:${sps}${styleName}:[^ ]+${sps})`;
