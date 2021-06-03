@@ -43,16 +43,16 @@ let mcls = `${cls}*?`;
 // todo: check with a tag like <a />
 
 const idSearch = 'data-element_id=';
-let spaceBegin = `(?<spaceBegin>${spa})`;
-let spaceEnd = `(?<spaceEnd>${sps})`;
-let attValue = `(?:(?:="(?<attValue>[^"]*?)")|${spa})`
-let attributeList = new RegExp(`${spaceBegin}(?<att>(?<attName>[a-z0-9\-\_]+)(${attValue})?)${spaceEnd}`, 'gis');
+// let spaceBegin = `(?<spaceBegin>${spa})`;
+// let spaceEnd = `(?<spaceEnd>${sps})`;
+// let attValue = `(?:(?:="(?<attValue>[^"]*?)")|${spa})`
+// let attributeList = new RegExp(`${spaceBegin}(?<att>(?<attName>[a-z0-9\-\_]+)(${attValue})?)${spaceEnd}`, 'gis');
 
 
 let textdomfr = new Map(),
   textdomfa = new Map();
 
-let extraMeta = new RegExp(`(="")|${space}`, 'g');
+// let extraMeta = new RegExp(`(="")|${space}`, 'g');
 
 function domHtmlManipulator(html, domHtml) {
 
@@ -440,51 +440,51 @@ domHtmlManipulator.prototype.parseAll = function parseAll(str) {
 
 
 
-domHtmlManipulator.prototype.getAttributeContext = function getAttributeContext(start, end) {
-  let attStartPos = this.tagStAfPos;
-  let attStr = this.html
-    .substring(attStartPos, this.tagStClPos);
+// domHtmlManipulator.prototype.getAttributeContext = function getAttributeContext(start, end) {
+//   let attStartPos = this.tagStAfPos;
+//   let attStr = this.html
+//     .substring(attStartPos, this.tagStClPos);
 
-  for (let match of attStr.matchAll(attributeList)) {
+//   for (let match of attStr.matchAll(attributeList)) {
 
-    let attNameStart = attStartPos + match.index + match.groups.spaceBegin.length;
-    let attNameEnd = attNameStart + match.groups.attName.length;
-    let attValueStart = attNameEnd + 2;
-    let attValueEnd = attValueStart + match.groups.attValue ? match.groups.attValue.length : 0;
-
-
-    if (start >= attNameStart && start <= attNameEnd && end >= attNameStart && end <= attNameEnd)
-      return 'attributeName'
-    else if (start >= attValueStart && start <= attValueEnd && end >= attValueStart && end <= attValueEnd)
-      return 'attributeValue'
+//     let attNameStart = attStartPos + match.index + match.groups.spaceBegin.length;
+//     let attNameEnd = attNameStart + match.groups.attName.length;
+//     let attValueStart = attNameEnd + 2;
+//     let attValueEnd = attValueStart + match.groups.attValue ? match.groups.attValue.length : 0;
 
 
-  }
-  return false;
-}
+//     if (start >= attNameStart && start <= attNameEnd && end >= attNameStart && end <= attNameEnd)
+//       return 'attributeName'
+//     else if (start >= attValueStart && start <= attValueEnd && end >= attValueStart && end <= attValueEnd)
+//       return 'attributeValue'
 
 
-domHtmlManipulator.prototype.getContext = function getContext(start, end) {
+//   }
+//   return false;
+// }
 
-  if (start > end)
-    ([end, start] = [start, end])
 
-  if (end > this.tagStPos && start <= this.tagStPos)
-    return false;
-  else if (end > this.tagStClAfPos && start < this.tagStClAfPos)
-    return false;
+// domHtmlManipulator.prototype.getContext = function getContext(start, end) {
 
-  else if ((start >= this.tagEnPos && start < this.tagClosingNameStart) || (end > this.tagEnPos && end < this.tagClosingNameStart) || (start <= this.tagEnPos && end > this.tagClosingNameStart))
-    return false;
-  else if (end >= this.tagEnClAfPos && start <= this.tagEnClAfPos)
-    return false;
-  else if (start > this.tagNameEnd && start < this.tagStClPos || end > this.tagNameEnd && end < this.tagStClPos) {
-    return this.getAttributeContext(start, end)
-  }
-  else
-    return true;
+//   if (start > end)
+//     ([end, start] = [start, end])
 
-}
+//   if (end > this.tagStPos && start <= this.tagStPos)
+//     return false;
+//   else if (end > this.tagStClAfPos && start < this.tagStClAfPos)
+//     return false;
+
+//   else if ((start >= this.tagEnPos && start < this.tagClosingNameStart) || (end > this.tagEnPos && end < this.tagClosingNameStart) || (start <= this.tagEnPos && end > this.tagClosingNameStart))
+//     return false;
+//   else if (end >= this.tagEnClAfPos && start <= this.tagEnClAfPos)
+//     return false;
+//   else if (start > this.tagNameEnd && start < this.tagStClPos || end > this.tagNameEnd && end < this.tagStClPos) {
+//     return this.getAttributeContext(start, end)
+//   }
+//   else
+//     return true;
+
+// }
 
 /**
  * apply an add change for a html to its counterpart dom
