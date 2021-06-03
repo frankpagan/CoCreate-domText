@@ -113,7 +113,7 @@ domHtmlManipulator.prototype.findStartTagById = function findStartTagById() {
   let tagStart = this.html.match(new RegExp(reg, "is"));
 
   if (!tagStart)
-    return false;
+    throw new Error('element is not valid or can not be found');
 
 
   this.target = this.param.target;
@@ -154,7 +154,7 @@ domHtmlManipulator.prototype.findClosingTag = function findClosingTag() {
   let match = this.html.substr(this.tagStClAfPos)
     .matchAll(new RegExp(`(?<tagWhole>${getEndTag(this.tagName)}${at}*?${the})`, 'gi'));
 
-  if (!match) throw new Error('could find any closing tag');
+  if (!match) throw new Error('can not find any closing tag');
 
   let nest = 0;
 
@@ -175,7 +175,7 @@ domHtmlManipulator.prototype.findClosingTag = function findClosingTag() {
     else
       nest++;
   }
-
+  throw new Error('closing tag and openning tag order does not match')
 }
 
 domHtmlManipulator.prototype.insertAdjacentElement =
@@ -196,8 +196,8 @@ domHtmlManipulator.prototype.insertAdjacentElement =
 
     this.param.target = target;
     this.reset();
-    if (!this.findStartTagById())
-      throw new Error('insertAdjacentElement: target not found');
+    this.findStartTagById()
+
 
     let insertPos;
     switch (position) {
@@ -207,8 +207,7 @@ domHtmlManipulator.prototype.insertAdjacentElement =
         break;
       case "beforeend":
       case "afterend":
-        if (!this.findClosingTag())
-          throw new Error('closing tag could not be found');
+        this.findClosingTag()
         insertPos = (position == 'beforeend' ? this.tagEnPos : this.tagEnClAfPos);
         break;
     }
@@ -331,7 +330,7 @@ domHtmlManipulator.prototype.findAttribute =
   function findAttribute(property) {
 
     if (!this.findStartTagById())
-      return false;
+      throw new Error('attribute can not be found');
 
     let prRegAttr = getRegAttribute(property);
     let regex = `^(?<beforeAtt>${at}*?)${prRegAttr}`;
