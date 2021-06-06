@@ -1,3 +1,10 @@
+## [1.0.2](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.0.1...v1.0.2) (2021-06-06)
+
+
+### Bug Fixes
+
+* add new elements, edit text ([df316cd](https://github.com/CoCreate-app/CoCreate-domText/commit/df316cd52d3f9bab1a89698f5a0026a3e4a27bb7))
+
 ## [1.0.1](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.0.0...v1.0.1) (2021-05-24)
 
 
