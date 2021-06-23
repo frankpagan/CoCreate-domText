@@ -4,8 +4,8 @@ A simple domText component in vanilla javascript. Easily configured using HTML5 
 
 ![GitHub file size in bytes](https://img.shields.io/github/size/CoCreate-app/CoCreate-domText/dist/CoCreate-domText.min.js?label=minified%20size&style=for-the-badge)
 ![GitHub latest release](https://img.shields.io/github/v/release/CoCreate-app/CoCreate-domText?style=for-the-badge)
-![GitHub](https://img.shields.io/github/license/CoCreate-app/CoCreate-domText?style=for-the-badge)
-![GitHub labels](https://img.shields.io/github/labels/CoCreate-app/CoCreate-domText/help%20wanted?style=for-the-badge)
+<!--![GitHub](https://img.shields.io/github/license/CoCreate-app/CoCreate-domText?style=for-the-badge)-->
+<!--![GitHub labels](https://img.shields.io/github/labels/CoCreate-app/CoCreate-domText/help%20wanted?style=for-the-badge)-->
 
 ![CoCreate-domText](https://cdn.cocreate.app/docs/CoCreate-domText.gif)
 
@@ -17,10 +17,6 @@ For a complete guide and working demo refer to the [doumentation](https://cocrea
 
 ```html
 <script src="https://cdn.cocreate.app/domText/latest/CoCreate-domText.min.js"></script>
-```
-
-```html
-<script src="https://cdn.cocreate.app/domText/latest/CoCreate-domText.min.css"></script>
 ```
 
 ## NPM
@@ -72,4 +68,12 @@ We appreciate your continued support, thank you!
 
 # License
 
-[UNLICENSED](https://github.com/CoCreate-app/CoCreate-domText/blob/master/LICENSE)
+If you want to use CoCreate-domText to develop commercial sites, themes, projects, and applications, the Commercial license is the appropriate license. With this option, your source code is kept proprietary. Purchase a CoCreate Commercial License at 
+
+[cocreate.app/commercial-license](https://cocreate.app/#commercial-license)
+
+### Open source license
+
+If you are creating an open source application under a license compatible with the [GNU GPL license v3](https://www.gnu.org/licenses/gpl-3.0.html), you may use CoCreate-domText under the terms of the GPLv3.
+
+[GNU GPL license v3 (GPLv3)](https://github.com/CoCreate-app/CoCreate-text/blob/master/LICENSE)
