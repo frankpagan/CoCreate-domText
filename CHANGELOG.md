@@ -1,3 +1,10 @@
+## [1.0.3](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.0.2...v1.0.3) (2021-06-23)
+
+
+### Bug Fixes
+
+* update to new crud.save and crud.read ([d1dfa82](https://github.com/CoCreate-app/CoCreate-domText/commit/d1dfa82e02e76dbaf74ad9831669785704af8b9b))
+
 ## [1.0.2](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.0.1...v1.0.2) (2021-06-06)
 
 
