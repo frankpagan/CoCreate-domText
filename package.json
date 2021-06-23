@@ -21,7 +21,7 @@
     "javascript-framework"
   ],
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   },
   "scripts": {
     "start": "npx webpack --config webpack.config.js",
@@ -37,7 +37,7 @@
     "url": "git+https://github.com/CoCreate-app/CoCreate-domText.git"
   },
   "author": "CoCreate LLC",
-  "license": "UNLICENSED",
+  "license": "SEE LICENSE",
   "bugs": {
     "url": "https://github.com/CoCreate-app/CoCreate-domText/issues"
   },
