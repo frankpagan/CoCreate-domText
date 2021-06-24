@@ -1,6 +1,6 @@
 {
   "name": "@cocreate/domtext",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A simple domText component in vanilla javascript. Easily configured using HTML5 data-attributes and/or JavaScript API.",
   "keywords": [
     "text-to-dom",
@@ -20,7 +20,9 @@
     "html5-framework",
     "javascript-framework"
   ],
-  "publishConfig": { "access": "public" },
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "start": "npx webpack --config webpack.config.js",
     "build": "NODE_ENV=production npx webpack --config webpack.config.js",
@@ -36,7 +38,9 @@
   },
   "author": "CoCreate LLC",
   "license": "SEE LICENSE",
-  "bugs": { "url": "https://github.com/CoCreate-app/CoCreate-domText/issues" },
+  "bugs": {
+    "url": "https://github.com/CoCreate-app/CoCreate-domText/issues"
+  },
   "homepage": "https://cocreate.app/docs/domText",
   "funding": {
     "type": "GitHub Sponsors ❤",
@@ -63,5 +67,7 @@
     "webpack-log": "^3.0.1",
     "xmldom": "^0.6.0"
   },
-  "dependencies": { "@cocreate/docs": "latest" }
+  "dependencies": {
+    "@cocreate/docs": "latest"
+  }
 }
