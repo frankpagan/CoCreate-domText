@@ -1,28 +1,40 @@
-# CoCreate-domText
+# CoCreate-domtext
 
-A simple domText component in vanilla javascript. Easily configured using HTML5 data-attributes and/or JavaScript API. Take it for a spin in our [playground!](https://cocreate.app/docs/domText)
+A simple domText component in vanilla javascript. Easily configured using HTML5 data-attributes and/or JavaScript API. Take it for a spin in our [playground!](https://cocreate.app/docs/domtext)
 
-![GitHub file size in bytes](https://img.shields.io/github/size/CoCreate-app/CoCreate-domText/dist/CoCreate-domText.min.js?label=minified%20size&style=for-the-badge)
-![GitHub latest release](https://img.shields.io/github/v/release/CoCreate-app/CoCreate-domText?style=for-the-badge)
-<!--![GitHub](https://img.shields.io/github/license/CoCreate-app/CoCreate-domText?style=for-the-badge)-->
-<!--![GitHub labels](https://img.shields.io/github/labels/CoCreate-app/CoCreate-domText/help%20wanted?style=for-the-badge)-->
+![minified](https://img.badgesize.io/https://cdn.cocreate.app/domtext/latest/CoCreate-domtext.min.js?style=flat-square&label=minified&color=orange)
+![gzip](https://img.badgesize.io/https://cdn.cocreate.app/domtext/latest/CoCreate-domtext.min.js?compression=gzip&style=flat-square&label=gzip&color=yellow)
+![brotli](https://img.badgesize.io/https://cdn.cocreate.app/domtext/latest/CoCreate-domtext.min.js?compression=brotli&style=flat-square&label=brotli)
+![GitHub latest release](https://img.shields.io/github/v/release/CoCreate-app/CoCreate-domtext?style=flat-square)
+![License](https://img.shields.io/github/license/CoCreate-app/CoCreate-domtext?style=flat-square)
+![Hiring](https://img.shields.io/static/v1?style=flat-square&label=&message=Hiring&color=blueviolet)
 
-![CoCreate-domText](https://cdn.cocreate.app/docs/CoCreate-domText.gif)
+![CoCreate-domtext](https://cdn.cocreate.app/docs/CoCreate-domtext.gif)
 
-## [Docs & Demo](https://cocreate.app/docs/domText)
+## [Docs & Demo](https://cocreate.app/docs/domtext)
 
-For a complete guide and working demo refer to the [doumentation](https://cocreate.app/docs/domText)
+For a complete guide and working demo refer to the [doumentation](https://cocreate.app/docs/domtext)
 
 ## CDN
 
 ```html
-<script src="https://cdn.cocreate.app/domText/latest/CoCreate-domText.min.js"></script>
+<script src="https://cdn.cocreate.app/domtext/latest/CoCreate-domtext.min.js"></script>
+```
+
+```html
+<script src="https://cdn.cocreate.app/domtext/latest/CoCreate-domtext.min.css"></script>
 ```
 
 ## NPM
 
 ```shell
-$ npm install @cocreate/domText
+$ npm i @cocreate/domtext
+```
+
+## yarn
+
+```shell
+$ yarn install @cocreate/domtext
 ```
 
 # Table of Contents
@@ -38,42 +50,34 @@ $ npm install @cocreate/domText
 
 # Announcements
 
-All updates to this library are documented in our [CHANGELOG](https://github.com/CoCreate-app/CoCreate-domText/blob/master/CHANGELOG.md) and [releases](https://github.com/CoCreate-app/CoCreate-domText/releases). You may also subscribe to email for releases and breaking changes.
+All updates to this library are documented in our [CHANGELOG](https://github.com/CoCreate-app/CoCreate-domtext/blob/master/CHANGELOG.md) and [releases](https://github.com/CoCreate-app/CoCreate-domtext/releases). You may also subscribe to email for releases and breaking changes.
 
 <a name="roadmap"></a>
 
 # Roadmap
 
-If you are interested in the future direction of this project, please take a look at our open [issues](https://github.com/CoCreate-app/CoCreate-domText/issues) and [pull requests](https://github.com/CoCreate-app/CoCreate-domText/pulls). We would love to hear your feedback.
+If you are interested in the future direction of this project, please take a look at our open [issues](https://github.com/CoCreate-app/CoCreate-domtext/issues) and [pull requests](https://github.com/CoCreate-app/CoCreate-domtext/pulls). We would love to hear your feedback.
 
 <a name="about"></a>
 
 # About
 
-CoCreate-domText is guided and supported by the CoCreate Developer Experience Team.
+CoCreate-domtext is guided and supported by the CoCreate Developer Experience Team.
 
 Please Email the Developer Experience Team [here](mailto:develop@cocreate.app) in case of any queries.
 
-CoCreate-domText is maintained and funded by CoCreate. The names and logos for CoCreate are trademarks of CoCreate, LLC.
+CoCreate-domtext is maintained and funded by CoCreate. The names and logos for CoCreate are trademarks of CoCreate, LLC.
 
 <a name="contribute"></a>
 
 # How to Contribute
 
-We encourage contribution to our libraries (you might even score some nifty swag), please see our [CONTRIBUTING](https://github.com/CoCreate-app/CoCreate-domText/blob/master/CONTRIBUTING.md) guide for details.
+We encourage contribution to our libraries (you might even score some nifty swag), please see our [CONTRIBUTING](https://github.com/CoCreate-app/CoCreate-domtext/blob/master/CONTRIBUTING.md) guide for details.
 
-We want this library to be community-driven, and CoCreate led. We need your help to realize this goal. To help make sure we are building the right things in the right order, we ask that you create [issues](https://github.com/CoCreate-app/CoCreate-domText/issues) and [pull requests](https://github.com/CoCreate-app/CoCreate-domText/pulls) or merely upvote or comment on existing issues or pull requests.
+We want this library to be community-driven, and CoCreate led. We need your help to realize this goal. To help make sure we are building the right things in the right order, we ask that you create [issues](https://github.com/CoCreate-app/CoCreate-domtext/issues) and [pull requests](https://github.com/CoCreate-app/CoCreate-domtext/pulls) or merely upvote or comment on existing issues or pull requests.
 
 We appreciate your continued support, thank you!
 
 # License
 
-If you want to use CoCreate-domText to develop commercial sites, themes, projects, and applications, the Commercial license is the appropriate license. With this option, your source code is kept proprietary. Purchase a CoCreate Commercial License at 
-
-[cocreate.app/commercial-license](https://cocreate.app/#commercial-license)
-
-### Open source license
-
-If you are creating an open source application under a license compatible with the [GNU GPL license v3](https://www.gnu.org/licenses/gpl-3.0.html), you may use CoCreate-domText under the terms of the GPLv3.
-
-[GNU GPL license v3 (GPLv3)](https://github.com/CoCreate-app/CoCreate-text/blob/master/LICENSE)
+[The MIT License (MIT)](https://github.com/CoCreate-app/CoCreate-domtext/blob/master/LICENSE)
