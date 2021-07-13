@@ -1,3 +1,11 @@
+## [1.0.12](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.0.11...v1.0.12) (2021-07-13)
+
+
+### Bug Fixes
+
+* add yarn lockfile to git ignore ([c906f0b](https://github.com/CoCreate-app/CoCreate-domText/commit/c906f0bb9254656948197042b8b66d2514101a38))
+* remove yarn.lock ([faa5cf2](https://github.com/CoCreate-app/CoCreate-domText/commit/faa5cf25eafd5245bd951a5c22eb84c4606d1210))
+
 ## [1.0.11](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.0.10...v1.0.11) (2021-07-10)
 
 
