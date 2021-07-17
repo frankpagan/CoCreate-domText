@@ -1,3 +1,10 @@
+## [1.0.14](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.0.13...v1.0.14) (2021-07-17)
+
+
+### Bug Fixes
+
+* workflows ([0e1eb35](https://github.com/CoCreate-app/CoCreate-domText/commit/0e1eb358650940c391bf15acae972713ee4f3388))
+
 ## [1.0.13](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.0.12...v1.0.13) (2021-07-14)
 
 
