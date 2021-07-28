@@ -65,8 +65,8 @@ let textArea = document.getElementById('textArea');
 
 
 let crdtCon = {
-  collection: textArea.getAttribute('data-collection'),
-  document_id: textArea.getAttribute('data-document_id'),
+  collection: textArea.getAttribute('collection'),
+  document_id: textArea.getAttribute('document_id'),
   name: textArea.getAttribute('name'),
 
 };
