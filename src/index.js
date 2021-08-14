@@ -42,7 +42,7 @@ let cls = getRegClass(allClassName);
 let mcls = `${cls}*?`;
 // todo: check with a tag like <a />
 
-const idSearch = 'data-element_id=';
+const idSearch = 'element_id=';
 // let spaceBegin = `(?<spaceBegin>${spa})`;
 // let spaceEnd = `(?<spaceEnd>${sps})`;
 // let attValue = `(?:(?:="(?<attValue>[^"]*?)")|${spa})`
@@ -108,7 +108,7 @@ domHtmlManipulator.prototype.setCallback = function setCallback({ addCallback, r
 
 domHtmlManipulator.prototype.findStartTagById = function findStartTagById() {
 
-  let sch = `(?:${sps}data-element_id\=\"${this.param.target}\"${sps})`;
+  let sch = `(?:${sps}element_id\=\"${this.param.target}\"${sps})`;
   let reg = `(?<tagWhole>${tgs}${at}*?${sch}${at}*?${the})`;
   let tagStart = this.html.match(new RegExp(reg, "is"));
 
@@ -571,7 +571,7 @@ domHtmlManipulator.prototype.rebuildByElement = function rebuildByElement(id, el
   //   return console.warn('breaking change');
 
   let realDomTarget =
-    this.domHtml.querySelector(`[data-element_id="${this.target}"]`);
+    this.domHtml.querySelector(`[element_id="${this.target}"]`);
 
 
 
@@ -602,12 +602,12 @@ function isTextOrEl(el) {
 
 function elIndexOf(id, elList, from) {
   for (let i = 0; i < elList.length; i++) {
-    if (isTextOrEl(elList[i]) === false && elList[i].getAttribute('data-element_id') == id)
+    if (isTextOrEl(elList[i]) === false && elList[i].getAttribute('element_id') == id)
       return i;
   }
 
   return -1;
-  // Array.from(elList).some(el => el.getAttribute('data-element_id') == id)
+  // Array.from(elList).some(el => el.getAttribute('element_id') == id)
 
 }
 
@@ -719,7 +719,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, f
         }
         else {
           rightChild.before(document.createTextNode(leftChild.data))
-          let rightId = rightChild.getAttribute('data-element_id');
+          let rightId = rightChild.getAttribute('element_id');
 
           if (rightId) {
             let elIndex = elIndexOf(rightId, rightEl.childNodes)
@@ -747,8 +747,8 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, f
         }
         else {
           // teleport element if exist otherwise create it
-          let rightId = rightChild.getAttribute('data-element_id');
-          let leftId = leftChild.getAttribute('data-element_id');
+          let rightId = rightChild.getAttribute('element_id');
+          let leftId = leftChild.getAttribute('element_id');
 
           if (leftId && rightId !== leftId) {
             let elIndex = elIndexOf(leftId, rightEl.childNodes);
@@ -762,7 +762,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, f
             // new element has been added we should process the new element again at index
 
             rightChild = rightElChilds[index];
-            rightId = rightChild.getAttribute('data-element_id');
+            rightId = rightChild.getAttribute('element_id');
             if (rightId) {
               elIndex = elIndexOf(rightId, rightEl.childNodes)
 
@@ -812,7 +812,7 @@ function renameTagName(leftEl, rightEl) {
 }
 
 
-// overwrite except data-element_id
+// overwrite except element_id
 function assignAttributes(leftEl, rightEl) {
 
   for (let leftAtt of leftEl.attributes) {

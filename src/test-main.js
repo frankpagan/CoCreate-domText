@@ -11,12 +11,12 @@ function replaceText(html){
 
 }
 
-// let html = `	<body data-element_id="body" style="padding:1;">
+// let html = `	<body element_id="body" style="padding:1;">
 		
-// 		<h1 data-element_id="t1" name="1">test 4441</h1>
-// 		<h1 data-element_id="t3" name="3">test 3<h1 data-element_id="t5" name="5">test 5</h1> still test 3 <h1 data-element_id="t6" name="6">test 6</h1>hhhhhh </h1>
-// 		<h1 data-element_id="t2" name="2">test 2</h1>
-// 		<h1 data-element_id="t4" name="4">test 4</h1>`;
+// 		<h1 element_id="t1" name="1">test 4441</h1>
+// 		<h1 element_id="t3" name="3">test 3<h1 element_id="t5" name="5">test 5</h1> still test 3 <h1 element_id="t6" name="6">test 6</h1>hhhhhh </h1>
+// 		<h1 element_id="t2" name="2">test 2</h1>
+// 		<h1 element_id="t4" name="4">test 4</h1>`;
 
   // crdt.replaceText({
   //   collection: "apples",

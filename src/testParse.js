@@ -42,7 +42,7 @@ let cls = getRegClass(allClassName);
 let mcls = `${cls}*?`;
 // todo: check with a tag like <a />
 
-const idSearch = 'data-element_id=';
+const idSearch = 'element_id=';
 let spaceBegin = `(?<spaceBegin>${spa})`;
 let spaceEnd = `(?<spaceEnd>${sps})`;
 let attValue = `(?:(?:="(?<attValue>[^"]*?)")|${spa})`
@@ -54,13 +54,13 @@ let textdomfr = new Map(),
   
 let html = `<!DOCTYPE html><html>
   
-	<body data-element_id="body" style="padding:1;">
+	<body element_id="body" style="padding:1;">
 	<textarea     
-	      <h1 name="4"      class="color:red"      \t data-element_id="445797c5-e01b-42cf-a8a5-f753ab60c8f6" >test 5</h1>
-		<h1 data-element_id="t1" name="1">test 1</h1>
-		<h1 data-element_id="t3" name="3">test 3</h1>
-		<h1 data-element_id="t2" name="2">test 2</h1>
-		<h1 data-element_id="t4" name="4">test 4</h1>
+	      <h1 name="4"      class="color:red"      \t element_id="445797c5-e01b-42cf-a8a5-f753ab60c8f6" >test 5</h1>
+		<h1 element_id="t1" name="1">test 1</h1>
+		<h1 element_id="t3" name="3">test 3</h1>
+		<h1 element_id="t2" name="2">test 2</h1>
+		<h1 element_id="t4" name="4">test 4</h1>
 		
 		<script>
         var config = {
@@ -76,7 +76,7 @@ let html = `<!DOCTYPE html><html>
 	</body>
 </html>`
   
-   let sch = `(?:${sps}data-element_id\=\"445797c5-e01b-42cf-a8a5-f753ab60c8f6\"${sps})`;
+   let sch = `(?:${sps}element_id\=\"445797c5-e01b-42cf-a8a5-f753ab60c8f6\"${sps})`;
   let reg = `(?<tagWhole>${tgs}${at}*?${sch}${at}*?${the})`;
  let r = html.match(new RegExp(`${reg}`,'is'))
   

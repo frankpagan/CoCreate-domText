@@ -118,14 +118,14 @@ window.refresh = function refresh() {
     value: `<!DOCTYPE html><html>
 	<head>
 	</head>
-	<body data-element_id="body" style="padding:1;">
+	<body element_id="body" style="padding:1;">
 		
-		<h1 data-element_id="t1" name="1">test 1</h1>
-		<h1 data-element_id="t3" name="3">test 3</h1>
-		<h1 data-element_id="t2" name="2">test 2</h1>
-		<h1 data-element_id="t4" name="4">test 4</h1>
+		<h1 element_id="t1" name="1">test 1</h1>
+		<h1 element_id="t3" name="3">test 3</h1>
+		<h1 element_id="t2" name="2">test 2</h1>
+		<h1 element_id="t4" name="4">test 4</h1>
 			
-        <script data-element_id="script1">
+        <script element_id="script1">
             var config = {
               apiKey: 'c2b08663-06e3-440c-ef6f-13978b42883a',
               securityKey: 'f26baf68-e3a9-45fc-effe-502e47116265',

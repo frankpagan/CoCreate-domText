@@ -17,19 +17,19 @@ import  '../../CoCreate-text/src';
 import domText from '../../CoCreate-domText/src';
 let textArea = document.getElementById('textArea');
 
-// let str = `	<body data-element_id="body" style="padding:1;">
+// let str = `	<body element_id="body" style="padding:1;">
 		
-// 		<h1 data-element_id="t1" name="1">test 4441</h1>
-// 		<h1 data-element_id="t3" name="3">test 3</h1>
-// 		<h1 data-element_id="t2" name="2">test 2</h1>
-// 		<h1 data-element_id="t4" name="4">test 4</h1>`
+// 		<h1 element_id="t1" name="1">test 4441</h1>
+// 		<h1 element_id="t3" name="3">test 3</h1>
+// 		<h1 element_id="t2" name="2">test 2</h1>
+// 		<h1 element_id="t4" name="4">test 4</h1>`
 
 // function posIdMap(){
 //   this.id = [];
 //   this.offset = [];
 // }
 
-//   const attRegex = /data-element_id="([^"]+?)"/i;
+//   const attRegex = /element_id="([^"]+?)"/i;
 // posIdMap.prototype.generateMapIdPos = function generateMapIdPos(){
 //   let matches = this.html.matchAll(attRegex);
 //   for(let match of matches)
@@ -72,7 +72,7 @@ let crdtCon = {
 };
 
 crdt.init(crdtCon);
-const elIdSch = 'data-element_id="';
+const elIdSch = 'element_id="';
 const eIdAfter = elIdSch.length;
 
 textArea.addEventListener('cocreate-crdt-update', function(event) {
@@ -112,7 +112,7 @@ textArea.addEventListener('cocreate-crdt-update', function(event) {
   // else
   // chunk2 = html;
   
-  // let ch1Index = chunk1.IndexOf('data-element_id="');
+  // let ch1Index = chunk1.IndexOf('element_id="');
   // if(ch1Index != -1)
   //     getElId(ch1Index);
   

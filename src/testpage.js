@@ -13,14 +13,14 @@ let resetHtml = `<!DOCTYPE html>
 	<head>
 	</head>
 	<body style="padding:1;">
-	    <div data-element_id="main">
+	    <div element_id="main">
 	
-    		<h1 data-element_id="t1" name="1">test 1</h1>
-    		<h1 data-element_id="t3" name="3">test 3</h1>
-    		<h1 data-element_id="t2" name="2">test 2</h1>
-    		<h1 data-element_id="t4" name="4">test 4</h1>
+    		<h1 element_id="t1" name="1">test 1</h1>
+    		<h1 element_id="t3" name="3">test 3</h1>
+    		<h1 element_id="t2" name="2">test 2</h1>
+    		<h1 element_id="t4" name="4">test 4</h1>
     			
-            <script data-element_id="script1">
+            <script element_id="script1">
                 var config = {
                   apiKey: 'c2b08663-06e3-440c-ef6f-13978b42883a',
                   securityKey: 'f26baf68-e3a9-45fc-effe-502e47116265',
@@ -96,9 +96,9 @@ function assertEqual(html, callback) {
     let isError = false;;
     let messages = [];
     doc.querySelectorAll('*').forEach(el => {
-        let id = el.getAttribute('data-element_id')
+        let id = el.getAttribute('element_id')
         if (id) {
-            if (!document.querySelector(`[data-element_id="${id}"]`)) {
+            if (!document.querySelector(`[element_id="${id}"]`)) {
                 messages.push('real dom doesn\'t have the element with id:' + id)
                 isError = true;
             }
@@ -107,9 +107,9 @@ function assertEqual(html, callback) {
     })
 
     // document.querySelectorAll('*').forEach(el => {
-    //     let id = el.getAttribute('data-element_id')
+    //     let id = el.getAttribute('element_id')
     //     if (id) {
-    //         if (!doc.querySelector(`[data-element_id="${id}"]`)) {
+    //         if (!doc.querySelector(`[element_id="${id}"]`)) {
     //             messages.push('html dom doesn\'t have the element with id:' + id)
     //             isError = true;
 
@@ -131,14 +131,14 @@ test('remove a whole element', resetHtml, () => {
 	<head>
 	</head>
 	<body style="padding:1;">
-	    <div data-element_id="main">
+	    <div element_id="main">
 	
-        		<h1 data-element_id="t1" name="1">test 1</h1>
-             	<h1 data-element_id="t3" name="3">test 3</h1>
-  /remove.from/ <h1 data-element_id="t2" name="2">test 2</h1>  /remove.to/
-        		<h1 data-element_id="t4" name="4">test 4</h1>
+        		<h1 element_id="t1" name="1">test 1</h1>
+             	<h1 element_id="t3" name="3">test 3</h1>
+  /remove.from/ <h1 element_id="t2" name="2">test 2</h1>  /remove.to/
+        		<h1 element_id="t4" name="4">test 4</h1>
     			
-            <script data-element_id="script1">
+            <script element_id="script1">
                 var config = {
                   apiKey: 'c2b08663-06e3-440c-ef6f-13978b42883a',
                   securityKey: 'f26baf68-e3a9-45fc-effe-502e47116265',
@@ -157,7 +157,7 @@ test('remove a whole element', resetHtml, () => {
     let d = new domHtmlManipulator(html, document.body.parentElement);
     let dump = d.changeDom({ pos, removeLength, html });
 
-    return [assertEqual(html), !document.querySelector(`[data-element_id="2"]`)]
+    return [assertEqual(html), !document.querySelector(`[element_id="2"]`)]
 
 
 })
@@ -171,14 +171,14 @@ test('remove element in a breaking way', resetHtml, () => {
 	<head>
 	</head>
 	<body style="padding:1;">
-	    <div data-element_id="main">
+	    <div element_id="main">
 
-        		<h1 data-element_id="t1" name="1">test 1</h1>
-             	<h1 data-element_id="t3" name="3">test 3</h1>
-  <h1 data-element_id="t2" name="2">test 2<//remove.from/h1>  /remove.to/
-        		<h1 data-element_id="t4" name="4">test 4</h1>
+        		<h1 element_id="t1" name="1">test 1</h1>
+             	<h1 element_id="t3" name="3">test 3</h1>
+  <h1 element_id="t2" name="2">test 2<//remove.from/h1>  /remove.to/
+        		<h1 element_id="t4" name="4">test 4</h1>
 
-            <script data-element_id="script1">
+            <script element_id="script1">
                 var config = {
                   apiKey: 'c2b08663-06e3-440c-ef6f-13978b42883a',
                   securityKey: 'f26baf68-e3a9-45fc-effe-502e47116265',
@@ -200,27 +200,27 @@ test('remove element in a breaking way', resetHtml, () => {
 
 
 
-    return [assertEqual(html), document.querySelector(`[data-element_id="t2"]`)]
+    return [assertEqual(html), document.querySelector(`[element_id="t2"]`)]
 
 })
 
 
 test('add an element with document id', resetHtml, () => {
 
-    let changeStr = '<h3 data-element_id="h333" name="123">asdasd</h3>';
+    let changeStr = '<h3 element_id="h333" name="123">asdasd</h3>';
     let html = `<!DOCTYPE html><html>
 	<head>
 	</head>
 	<body style="padding:1;">
-	    <div data-element_id="main">
+	    <div element_id="main">
 
-        		<h1 data-element_id="t1" name="1">test 1</h1>
-             	<h1 data-element_id="t3" name="3">test 3</h1>
-                <h1 data-element_id="t2" name="2">test 2</h1>  
+        		<h1 element_id="t1" name="1">test 1</h1>
+             	<h1 element_id="t3" name="3">test 3</h1>
+                <h1 element_id="t2" name="2">test 2</h1>  
                 /pos/${changeStr}
-        		<h1 data-element_id="t4" name="4">test 4</h1>
+        		<h1 element_id="t4" name="4">test 4</h1>
 
-            <script data-element_id="script1">
+            <script element_id="script1">
                 var config = {
                   apiKey: 'c2b08663-06e3-440c-ef6f-13978b42883a',
                   securityKey: 'f26baf68-e3a9-45fc-effe-502e47116265',
@@ -242,7 +242,7 @@ test('add an element with document id', resetHtml, () => {
 
 
 
-    return [assertEqual(html), document.querySelector(`[data-element_id="h333"]`)]
+    return [assertEqual(html), document.querySelector(`[element_id="h333"]`)]
 
 })
 
@@ -257,15 +257,15 @@ test('add more data to exisitng attribute  ', resetHtml, () => {
 	<head>
 	</head>
 	<body style="padding:1;">
-	    <div data-element_id="main">
+	    <div element_id="main">
 
-        		<h1 data-element_id="t1" name="1">test 1</h1>
-             	<h1 data-element_id="t3" name="3/pos/${changeStr}">test 3</h1>
-                <h1 data-element_id="t2" name="2">test 2</h1>  
+        		<h1 element_id="t1" name="1">test 1</h1>
+             	<h1 element_id="t3" name="3/pos/${changeStr}">test 3</h1>
+                <h1 element_id="t2" name="2">test 2</h1>  
                 
-        		<h1 data-element_id="t4" name="4">test 4</h1>
+        		<h1 element_id="t4" name="4">test 4</h1>
 
-            <script data-element_id="script1">
+            <script element_id="script1">
                 var config = {
                   apiKey: 'c2b08663-06e3-440c-ef6f-13978b42883a',
                   securityKey: 'f26baf68-e3a9-45fc-effe-502e47116265',
@@ -287,7 +287,7 @@ test('add more data to exisitng attribute  ', resetHtml, () => {
 
 
 
-    return [assertEqual(html), document.querySelector(`[data-element_id="t3"]`).getAttribute('name') === "3some info"]
+    return [assertEqual(html), document.querySelector(`[element_id="t3"]`).getAttribute('name') === "3some info"]
 
 })
 
@@ -303,15 +303,15 @@ test('create new attribute ', resetHtml, () => {
 	<head>
 	</head>
 	<body style="padding:1;">
-	    <div data-element_id="main">
+	    <div element_id="main">
 
-        		<h1 data-element_id="t1" name="1">test 1</h1>
-             	<h1 data-element_id="t3" name="3">test 3</h1>
-                <h1 data-element_id="t2" name="2" /pos/${changeStr}>test 2</h1>  
+        		<h1 element_id="t1" name="1">test 1</h1>
+             	<h1 element_id="t3" name="3">test 3</h1>
+                <h1 element_id="t2" name="2" /pos/${changeStr}>test 2</h1>  
                 
-        		<h1 data-element_id="t4" name="4">test 4</h1>
+        		<h1 element_id="t4" name="4">test 4</h1>
 
-            <script data-element_id="script1">
+            <script element_id="script1">
                 var config = {
                   apiKey: 'c2b08663-06e3-440c-ef6f-13978b42883a',
                   securityKey: 'f26baf68-e3a9-45fc-effe-502e47116265',
@@ -333,7 +333,7 @@ test('create new attribute ', resetHtml, () => {
 
 
 
-    return [assertEqual(html), document.querySelector(`[data-element_id="t2"]`).getAttribute('newAtt') === "fdgdf"]
+    return [assertEqual(html), document.querySelector(`[element_id="t2"]`).getAttribute('newAtt') === "fdgdf"]
 
 })
 
@@ -349,14 +349,14 @@ test('remove attribute', resetHtml, () => {
 	<head>
 	</head>
 	<body style="padding:1;">
-	    <div data-element_id="main">
+	    <div element_id="main">
 
-        		<h1 data-element_id="t1" name="1">test 1</h1>
-             	<h1 data-element_id="t3" name="3">test 3</h1>
-  <h1 data-element_id="t2" /remove.from/name="2" /remove.to/>test 2</h1> 
-        		<h1 data-element_id="t4" name="4">test 4</h1>
+        		<h1 element_id="t1" name="1">test 1</h1>
+             	<h1 element_id="t3" name="3">test 3</h1>
+  <h1 element_id="t2" /remove.from/name="2" /remove.to/>test 2</h1> 
+        		<h1 element_id="t4" name="4">test 4</h1>
 
-            <script data-element_id="script1">
+            <script element_id="script1">
                 var config = {
                   apiKey: 'c2b08663-06e3-440c-ef6f-13978b42883a',
                   securityKey: 'f26baf68-e3a9-45fc-effe-502e47116265',
@@ -377,7 +377,7 @@ test('remove attribute', resetHtml, () => {
 
 
 
-    let t2 = document.querySelector(`[data-element_id="t2"]`);
+    let t2 = document.querySelector(`[element_id="t2"]`);
 
     return [assertEqual(html), !t2.getAttribute('name')]
 
@@ -391,14 +391,14 @@ test('remove begining and ending of sibiling element to merge them into a valid 
 	<head>
 	</head>
 	<body style="padding:1;">
-	    <div data-element_id="main">
+	    <div element_id="main">
 
-        		<h1 data-element_id="t1" name="1">test 1</h1>
-             	<h1 data-element_id="t3" name="3">test 3</h1>
-  <h1 data-element_id="t2" /remove.from/name="2" >test 2</h1> 
-        		<h1 data-element_id="t4"/remove.to/ name="4">test 4</h1>
+        		<h1 element_id="t1" name="1">test 1</h1>
+             	<h1 element_id="t3" name="3">test 3</h1>
+  <h1 element_id="t2" /remove.from/name="2" >test 2</h1> 
+        		<h1 element_id="t4"/remove.to/ name="4">test 4</h1>
 
-            <script data-element_id="script1">
+            <script element_id="script1">
                 var config = {
                   apiKey: 'c2b08663-06e3-440c-ef6f-13978b42883a',
                   securityKey: 'f26baf68-e3a9-45fc-effe-502e47116265',
@@ -419,7 +419,7 @@ test('remove begining and ending of sibiling element to merge them into a valid 
 
 
 
-    let t2 = document.querySelector(`[data-element_id="t2"]`);
+    let t2 = document.querySelector(`[element_id="t2"]`);
 
     return [assertEqual(html), t2.getAttribute('name') === '4']
 
@@ -435,14 +435,14 @@ test('add strings between element', resetHtml, () => {
 	<head>
 	</head>
 	<body style="padding:1;">
-	    <div data-element_id="main">
+	    <div element_id="main">
                 aaa
-        		<h1 data-element_id="t1" name="1">test 1</h1>bbb
-             	<h1 data-element_id="t3" name="3">test 3</h1>ccc
-                <h1 data-element_id="t2" name="2" >test 2</h1>ddd
-        		<h1 data-element_id="t4" name="4">test 4</h1>eee
+        		<h1 element_id="t1" name="1">test 1</h1>bbb
+             	<h1 element_id="t3" name="3">test 3</h1>ccc
+                <h1 element_id="t2" name="2" >test 2</h1>ddd
+        		<h1 element_id="t4" name="4">test 4</h1>eee
                 /pos/${changeStr}
-            <script data-element_id="script1">
+            <script element_id="script1">
                 var config = {
                   apiKey: 'c2b08663-06e3-440c-ef6f-13978b42883a',
                   securityKey: 'f26baf68-e3a9-45fc-effe-502e47116265',
@@ -462,10 +462,10 @@ test('add strings between element', resetHtml, () => {
 
 
 
-    let t1 = document.querySelector(`[data-element_id="t1"]`);
-    let t2 = document.querySelector(`[data-element_id="t2"]`);
-    let t3 = document.querySelector(`[data-element_id="t3"]`);
-    let t4 = document.querySelector(`[data-element_id="t4"]`);
+    let t1 = document.querySelector(`[element_id="t1"]`);
+    let t2 = document.querySelector(`[element_id="t2"]`);
+    let t3 = document.querySelector(`[element_id="t3"]`);
+    let t4 = document.querySelector(`[element_id="t4"]`);
 
     return [assertEqual(html), t1.previousSibling.data.indexOf('aaa'), t1.nextSibling.data.startsWith('bbb'), t2.nextSibling.data.startsWith('ddd'), t3.nextSibling.data.startsWith('ccc'), t4.nextSibling.data.startsWith('eee')]
 
@@ -495,9 +495,9 @@ test('domToText: do insertAdjacentElement', resetHtml, () => {
 
 
     return assertEqual(d.html, (document) => {
-        let t1 = document.querySelector(`[data-element_id="t1"]`);
-        let t2 = document.querySelector(`[data-element_id="t2"]`);
-        let t3 = document.querySelector(`[data-element_id="t3"]`);
+        let t1 = document.querySelector(`[element_id="t1"]`);
+        let t2 = document.querySelector(`[element_id="t2"]`);
+        let t3 = document.querySelector(`[element_id="t3"]`);
         return [t1.nextElementSibling === t2, t2.nextElementSibling === t3]
     })
 
@@ -531,7 +531,7 @@ test('domToText: do innerText', resetHtml, () => {
 
     return assertEqual(d.html, (document) => {
 
-        let t3 = document.querySelector(`[data-element_id="t3"]`);
+        let t3 = document.querySelector(`[element_id="t3"]`);
         return [t3.innerText === "zxcasdwqe"]
     })
 
@@ -563,7 +563,7 @@ test('domToText: set new style', resetHtml, () => {
 
     return assertEqual(d.html, (document) => {
 
-        let t3 = document.querySelector(`[data-element_id="t3"]`);
+        let t3 = document.querySelector(`[element_id="t3"]`);
         return [t3.getAttribute('style').startsWith('background: red')]
     })
 
@@ -594,7 +594,7 @@ test('domToText: set new class', resetHtml, () => {
 
     return assertEqual(d.html, (document) => {
 
-        let t2 = document.querySelector(`[data-element_id="t2"]`);
+        let t2 = document.querySelector(`[element_id="t2"]`);
         return [t2.getAttribute('class').startsWith('background:blue')]
     })
 
@@ -625,7 +625,7 @@ test('domToText: set any attribute', resetHtml, () => {
 
     return assertEqual(d.html, (document) => {
 
-        let t2 = document.querySelector(`[data-element_id="t2"]`);
+        let t2 = document.querySelector(`[element_id="t2"]`);
         return [t2.getAttribute('aaa') === 'zxczxc']
     })
 
