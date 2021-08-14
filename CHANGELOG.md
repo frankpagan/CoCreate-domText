@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.1.0...v1.1.1) (2021-08-14)
+
+
+### Bug Fixes
+
+* rename data-element_id to element_id ([85cd72d](https://github.com/CoCreate-app/CoCreate-domText/commit/85cd72dfd19ce810f9c79750a015efc71fdd95eb))
+
 # [1.1.0](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.0.14...v1.1.0) (2021-07-28)
 
 
