@@ -1,3 +1,10 @@
+## [1.1.4](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.1.3...v1.1.4) (2021-08-23)
+
+
+### Bug Fixes
+
+* update package versions ([181dd04](https://github.com/CoCreate-app/CoCreate-domText/commit/181dd041efa4949a6a0fc0b2ffefec8c4976237e))
+
 ## [1.1.3](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.1.2...v1.1.3) (2021-08-22)
 
 
