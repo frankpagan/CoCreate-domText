@@ -178,6 +178,29 @@ domHtmlManipulator.prototype.findClosingTag = function findClosingTag() {
   throw new Error('closing tag and openning tag order does not match')
 }
 
+domHtmlManipulator.prototype.removeElement =
+  function removeElement({ element }) {
+
+    this.param.target = element;
+    // this.reset();
+
+    let pos = this.getWholeElement();
+      if (!pos)
+        throw new Error('removeElement: element not found');
+
+    this.reset();
+    this.findStartTagById();
+
+    let insertPos;
+    if (pos) {
+      if (pos.to < insertPos)
+        insertPos = insertPos - (pos.to - pos.from);
+      this.removeCallback(pos);
+    }
+
+
+  };
+  
 domHtmlManipulator.prototype.insertAdjacentElement =
   function insertAdjacentElement({ target, position, element, elementValue }) {
 
