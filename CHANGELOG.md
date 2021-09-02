@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.1.6...v1.2.0) (2021-09-02)
+
+
+### Features
+
+* function to removeElement from htmlText ([cd71202](https://github.com/CoCreate-app/CoCreate-domText/commit/cd712021505067962a71ae4b1965bb10cdd58206))
+
 ## [1.1.6](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.1.5...v1.1.6) (2021-08-31)
 
 
