@@ -24,9 +24,9 @@ module.exports = {
     new MiniCssExtractPlugin({
       filename: "[name].css",
     }),
-       new HtmlWebpackPlugin({
-      template: "./src/index.html",
-    }),
+    //   new HtmlWebpackPlugin({
+    //   template: "./src/index.html",
+    // }),
   ],
   // Default mode for Webpack is production.
   // Depending on mode Webpack will apply different things
