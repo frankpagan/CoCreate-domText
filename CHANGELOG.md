@@ -1,3 +1,10 @@
+## [1.2.4](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.2.3...v1.2.4) (2021-09-09)
+
+
+### Bug Fixes
+
+* CoCreate.config directory, path, name and  public ([7f5e5ba](https://github.com/CoCreate-app/CoCreate-domText/commit/7f5e5ba109e466005c0587120ed3fa26e325f71e))
+
 ## [1.2.3](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.2.2...v1.2.3) (2021-09-08)
 
 
