@@ -1,3 +1,10 @@
+## [1.2.9](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.2.8...v1.2.9) (2021-09-14)
+
+
+### Bug Fixes
+
+* add cocreate.app to domains ([8257530](https://github.com/CoCreate-app/CoCreate-domText/commit/8257530fa012bb8dc975022fb140be9421cc8cce))
+
 ## [1.2.8](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.2.7...v1.2.8) (2021-09-13)
 
 
