@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.3.0...v1.3.1) (2021-09-16)
+
+
+### Bug Fixes
+
+* removeElement reset() ([63d3124](https://github.com/CoCreate-app/CoCreate-domText/commit/63d31246576e71749b63a204f515bb37dac19d8b))
+
 # [1.3.0](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.2.9...v1.3.0) (2021-09-16)
 
 
