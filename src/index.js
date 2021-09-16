@@ -182,7 +182,7 @@ domHtmlManipulator.prototype.removeElement =
   function removeElement({ element }) {
 
     this.param.target = element;
-    // this.reset();
+    this.reset();
 
     let pos = this.getWholeElement();
       if (!pos)
