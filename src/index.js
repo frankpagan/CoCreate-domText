@@ -396,7 +396,7 @@ domHtmlManipulator.prototype.removeAttribute = function removeAttribute({ target
     this.removeCallback({ from: this.atSt, to: this.atEn })
 };
 
-domHtmlManipulator.prototype.setInnerText = function setInnerText({ target, value }) {
+domHtmlManipulator.prototype.setInnerText = function setInnerText({ target, value, avoidTextToDom, metadata}) {
   this.param.target = target;
   this.reset();
   if (this.findStartTagById())
@@ -405,8 +405,8 @@ domHtmlManipulator.prototype.setInnerText = function setInnerText({ target, valu
     return false;
 
 
-  this.removeCallback({ from: this.tagStClAfPos, to: this.tagEnPos });
-  this.addCallback({ position: this.tagStClAfPos, value });
+  this.removeCallback({ from: this.tagStClAfPos, to: this.tagEnPos, avoidTextToDom, metadata });
+  this.addCallback({ position: this.tagStClAfPos, value, avoidTextToDom, metadata });
   return true;
 }
 
