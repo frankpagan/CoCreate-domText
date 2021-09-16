@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.2.9...v1.3.0) (2021-09-16)
+
+
+### Features
+
+* add support for metadata ([26bfa7e](https://github.com/CoCreate-app/CoCreate-domText/commit/26bfa7e401aa96e9921f425d5fb270b7ff3fcc52))
+
 ## [1.2.9](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.2.8...v1.2.9) (2021-09-14)
 
 
