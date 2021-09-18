@@ -1,6 +1,6 @@
 {
   "name": "@cocreate/domtext",
-  "version": "1.3.2",
+  "version": "1.3.3",
   "description": "A simple domText component in vanilla javascript. Easily configured using HTML5 data-attributes and/or JavaScript API.",
   "keywords": [
     "text-to-dom",

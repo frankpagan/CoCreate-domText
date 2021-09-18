@@ -1,3 +1,10 @@
+## [1.3.3](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.3.2...v1.3.3) (2021-09-18)
+
+
+### Bug Fixes
+
+* attributes were being replaced with each change, replaced  from and to with  start and end ([49e6861](https://github.com/CoCreate-app/CoCreate-domText/commit/49e6861d42f55d65b4623acfab0ba4480ad7f2f8))
+
 ## [1.3.2](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.3.1...v1.3.2) (2021-09-16)
 
 
