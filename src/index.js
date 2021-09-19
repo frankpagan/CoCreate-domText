@@ -2,11 +2,12 @@
 // tag name & attribute names are case-insensetive
 
 
-String.prototype.replaceAt = function(index, replacement) {
-	return this.substr(0, index) + replacement + this.substr(index);
+function replaceAt(html, index, replacement) {
+	return html.substr(0, index) + replacement + html.substr(index);
 };
-String.prototype.removeAt = function(index, to) {
-	return this.substr(0, index) + this.substr(to);
+
+function removeAt(html, index, to) {
+	return html.substr(0, index) + html.substr(to);
 };
 
 let spaceAll = "\u{0020}|\u{0009}|\u{000A}|\u{000C}|\u{000D}";
@@ -74,7 +75,7 @@ function domHtmlManipulator(html, domHtml) {
 
 
 }
-domHtmlManipulator.prototype.reset = function reset() {
+function reset() {
 	this.atEn = null, this.atSt = null, this.atVSt = null, this.atVSt = null;
 	this.tagStPos = null;
 	this.tagStAfPos = null;
@@ -86,38 +87,40 @@ domHtmlManipulator.prototype.reset = function reset() {
 	this.tagNameEnd = null;
 	this.haveClosingTag = null;
 }
-domHtmlManipulator.prototype.setCallback = function setCallback({ addCallback, removeCallback }) {
 
-	this.removeCallback = function(param) {
-		if(!param)
-			return false;
+function setCallback({ addCallback, removeCallback }) {
+
+	function removeCallback(param) {
+		if(!param) return;
+		let element = param.element;
+		let html = param.element.domTextHtml
 		// if (param.type != 'innerText')
 			textdomfr.set(param.from * param.to, true);
-		this.html = this.html.removeAt(param.from, param.to);
+		element.domTextHtml = removeAt(html, param.from, param.to);
 		removeCallback.call(null, param)
 	};
-	this.addCallback = function(param) {
-		if(!param)
-			return false;
+	
+	function addCallback(param) {
+		if(!param) return;
+		let element = param.element;
+		let html = param.element.domTextHtml
 		// if (param.type != 'innerText')
 			textdomfa.set(param.position + param.value, true);
-		this.html = this.html.replaceAt(param.position, param.value)
+		element.domTextHtml = replaceAt(html, param.position, param.value)
 		addCallback.call(null, param)
 	};
 
 }
 
-domHtmlManipulator.prototype.findStartTagById = function findStartTagById() {
-
-	let sch = `(?:${sps}element_id\=\"${this.param.target}\"${sps})`;
+function findStartTagById(element, id) {
+	
+	let sch = `(?:${sps}element_id\=\"${id}\"${sps})`;
 	let reg = `(?<tagWhole>${tgs}${at}*?${sch}${at}*?${the})`;
-	let tagStart = this.html.match(new RegExp(reg, "is"));
+	let tagStart = element.DomTextHtml.match(new RegExp(reg, "is"));
 
 	if(!tagStart)
 		throw new Error('element is not valid or can not be found');
 
-
-	this.target = this.param.target;
 	this.tagName = tagStart.groups.tagName.toUpperCase();
 
 
@@ -140,7 +143,7 @@ domHtmlManipulator.prototype.findStartTagById = function findStartTagById() {
 	return true;
 };
 
-domHtmlManipulator.prototype.getWholeElement = function getWholeElement() {
+function getWholeElement() {
 	if(this.findStartTagById()) {
 		this.findClosingTag()
 		return { start: this.tagStPos, end: this.tagEnClAfPos || this.tagStClAfPos };
@@ -150,7 +153,7 @@ domHtmlManipulator.prototype.getWholeElement = function getWholeElement() {
 };
 
 
-domHtmlManipulator.prototype.findClosingTag = function findClosingTag() {
+function findClosingTag() {
 
 	let match = this.html.substr(this.tagStClAfPos)
 		.matchAll(new RegExp(`(?<tagWhole>${getEndTag(this.tagName)}${at}*?${the})`, 'gi'));
@@ -179,11 +182,7 @@ domHtmlManipulator.prototype.findClosingTag = function findClosingTag() {
 	throw new Error('closing tag and openning tag order does not match')
 }
 
-domHtmlManipulator.prototype.removeElement =
-	function removeElement({ element }) {
-
-		this.param.target = element;
-		this.reset();
+function removeElement({ element }) {
 
 		let pos = this.getWholeElement();
 		if(!pos)
@@ -202,8 +201,7 @@ domHtmlManipulator.prototype.removeElement =
 
 	};
 
-domHtmlManipulator.prototype.insertAdjacentElement =
-	function insertAdjacentElement({ target, position, element, elementValue }) {
+function insertAdjacentElement({ target, position, element, elementValue }) {
 
 		this.param.target = element;
 		this.reset();
@@ -246,7 +244,7 @@ domHtmlManipulator.prototype.insertAdjacentElement =
 	};
 
 
-domHtmlManipulator.prototype.setClass = function setClass({ target, classname }) {
+function setClass({ target, classname }) {
 	this.param.target = target;
 	this.reset();
 	this.findAttribute("class");
@@ -264,7 +262,7 @@ domHtmlManipulator.prototype.setClass = function setClass({ target, classname })
 
 };
 
-domHtmlManipulator.prototype.setClassStyle = function setClassStyle({ target, classname, value, unit }) {
+function setClassStyle({ target, classname, value, unit }) {
 	this.param.target = target;
 	this.reset();
 	this.findAttribute("class");
@@ -283,7 +281,7 @@ domHtmlManipulator.prototype.setClassStyle = function setClassStyle({ target, cl
 };
 
 
-domHtmlManipulator.prototype.findClassPos = function findClassPos(classname, isStyle) {
+function findClassPos(classname, isStyle) {
 	let prRegClass = isStyle ? getRegClassStyle(classname) : getRegClass(classname);
 
 	let classStart = this.html
@@ -305,7 +303,7 @@ domHtmlManipulator.prototype.findClassPos = function findClassPos(classname, isS
 			start: this.atVEn,
 		};
 };
-domHtmlManipulator.prototype.setStyle = function setStyle({ target, styleName }) {
+function setStyle({ target, styleName }) {
 	this.param.target = target;
 	this.reset();
 	this.findAttribute("style");
@@ -325,7 +323,7 @@ domHtmlManipulator.prototype.setStyle = function setStyle({ target, styleName })
 	}
 };
 
-domHtmlManipulator.prototype.findStylePos = function findStylePos(style) {
+function findStylePos(style) {
 	let prRegStyle = getRegStyle(style);
 
 	let styleStart = this.html
@@ -350,8 +348,7 @@ domHtmlManipulator.prototype.findStylePos = function findStylePos(style) {
 
 
 // findAttribute
-domHtmlManipulator.prototype.findAttribute =
-	function findAttribute(property) {
+function findAttribute(property) {
 
 		if(!this.findStartTagById())
 			throw new Error('attribute can not be found');
@@ -378,7 +375,7 @@ domHtmlManipulator.prototype.findAttribute =
 
 
 
-domHtmlManipulator.prototype.setAttribute = function setAttribute({ target, name, value }) {
+function setAttribute({ target, name, value }) {
 
 	this.param.target = target;
 	this.reset();
@@ -389,7 +386,7 @@ domHtmlManipulator.prototype.setAttribute = function setAttribute({ target, name
 		this.addCallback({ position: this.atSt, value: ` ${name}="${value}"` })
 };
 
-domHtmlManipulator.prototype.removeAttribute = function removeAttribute({ target, name }) {
+function removeAttribute({ target, name }) {
 	this.param.target = target;
 	this.reset();
 	this.findAttribute(name);
@@ -397,7 +394,7 @@ domHtmlManipulator.prototype.removeAttribute = function removeAttribute({ target
 		this.removeCallback({ start: this.atSt, end: this.atEn })
 };
 
-domHtmlManipulator.prototype.setInnerText = function setInnerText({ target, value, start, end, avoidTextToDom, metadata }) {
+function setInnerText({ target, value, start, end, avoidTextToDom, metadata }) {
 	let type = 'innerText';
 	// console.log('poos', el)
 	this.param.target = target;
@@ -431,14 +428,13 @@ domHtmlManipulator.prototype.setInnerText = function setInnerText({ target, valu
 }
 
 
-
-domHtmlManipulator.prototype.getId = function getId(pos) {
+function getId(pos) {
 	let attWrapper = this.html[pos];
 	let endWrapper = this.html.indexOf(attWrapper, pos + 1)
 	return this.html.substring(pos + 1, endWrapper);
 }
 
-domHtmlManipulator.prototype.isPosOnEl = function isPosOnEl(elementIdPos, pathArray) {
+function isPosOnEl(elementIdPos, pathArray) {
 
 	this.param.target = this.getId(elementIdPos + idSearch.length);
 	this.reset();
@@ -460,7 +456,7 @@ domHtmlManipulator.prototype.isPosOnEl = function isPosOnEl(elementIdPos, pathAr
 	// }
 }
 
-domHtmlManipulator.prototype.parseAll = function parseAll(str) {
+function parseAll(str) {
 	let mainTag = str.match(/\<(?<tag>[a-z0-9]+)(.*?)?\>/).groups.tag;
 	if(!mainTag)
 		throw new Error('find position: can not find the main tag');
@@ -481,63 +477,7 @@ domHtmlManipulator.prototype.parseAll = function parseAll(str) {
 }
 
 
-
-// domHtmlManipulator.prototype.getAttributeContext = function getAttributeContext(start, end) {
-//   let attStartPos = this.tagStAfPos;
-//   let attStr = this.html
-//     .substring(attStartPos, this.tagStClPos);
-
-//   for (let match of attStr.matchAll(attributeList)) {
-
-//     let attNameStart = attStartPos + match.index + match.groups.spaceBegin.length;
-//     let attNameEnd = attNameStart + match.groups.attName.length;
-//     let attValueStart = attNameEnd + 2;
-//     let attValueEnd = attValueStart + match.groups.attValue ? match.groups.attValue.length : 0;
-
-
-//     if (start >= attNameStart && start <= attNameEnd && end >= attNameStart && end <= attNameEnd)
-//       return 'attributeName'
-//     else if (start >= attValueStart && start <= attValueEnd && end >= attValueStart && end <= attValueEnd)
-//       return 'attributeValue'
-
-
-//   }
-//   return false;
-// }
-
-
-// domHtmlManipulator.prototype.getContext = function getContext(start, end) {
-
-//   if (start > end)
-//     ([end, start] = [start, end])
-
-//   if (end > this.tagStPos && start <= this.tagStPos)
-//     return false;
-//   else if (end > this.tagStClAfPos && start < this.tagStClAfPos)
-//     return false;
-
-//   else if ((start >= this.tagEnPos && start < this.tagClosingNameStart) || (end > this.tagEnPos && end < this.tagClosingNameStart) || (start <= this.tagEnPos && end > this.tagClosingNameStart))
-//     return false;
-//   else if (end >= this.tagEnClAfPos && start <= this.tagEnClAfPos)
-//     return false;
-//   else if (start > this.tagNameEnd && start < this.tagStClPos || end > this.tagNameEnd && end < this.tagStClPos) {
-//     return this.getAttributeContext(start, end)
-//   }
-//   else
-//     return true;
-
-// }
-
-/**
- * apply an add change for a html to its counterpart dom
- * 
- * @param {Object} config - the config
- * @param {Number} config.pos - position of the change that happened
- * @param {String} condif.changeStr - the added string to the config.pos
- * 
- */
-
-domHtmlManipulator.prototype.addToDom = function addToDom({ pos, changeStr }) {
+function addToDom({ pos, changeStr }) {
 
 	let key = pos + changeStr;
 	if(textdomfa.has(key)) {
@@ -557,7 +497,7 @@ domHtmlManipulator.prototype.addToDom = function addToDom({ pos, changeStr }) {
  * @param {Number} config.pos - position of the change that happened
  * @param {Number} condif.removeLength - the added string to the config.pos
  */
-domHtmlManipulator.prototype.removeFromDom = function removeFromDom({ pos, removeLength }) {
+function removeFromDom({ pos, removeLength }) {
 
 	let key = pos * (removeLength + pos);
 	if(textdomfr.has(key)) {
@@ -571,7 +511,7 @@ domHtmlManipulator.prototype.removeFromDom = function removeFromDom({ pos, remov
 
 }
 
-domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, removeLength }) {
+function changeDom({ pos, changeStr, removeLength }) {
 	if(pos < 0 || pos > this.html.length)
 		throw new Error('position is out of range');
 
@@ -591,7 +531,7 @@ domHtmlManipulator.prototype.changeDom = function changeDom({ pos, changeStr, re
 
 }
 
-domHtmlManipulator.prototype.findElByPos = function findElByPos(pos) {
+function findElByPos(pos) {
 
 	let pos1 = pos - idSearch.length;
 	let pos2 = pos + idSearch.length;
@@ -613,15 +553,11 @@ domHtmlManipulator.prototype.findElByPos = function findElByPos(pos) {
 
 }
 
-domHtmlManipulator.prototype.rebuildByElement = function rebuildByElement(id, elList, from) {
+function rebuildByElement(id, elList, from) {
 
 	let newChangeInEl =
 		this.html.substring(this.tagStPos, this.tagEnClAfPos || this.tagStClAfPos);
 	if(!newChangeInEl) return;
-	// todo: is this needed?
-	// context = this.getContext(pos - removeLength, pos);
-	// if (!context)
-	//   return console.error('breaking change no dom change')
 
 	let [editorEl, ...rest] =
 	this.parseAll(newChangeInEl)
@@ -629,16 +565,8 @@ domHtmlManipulator.prototype.rebuildByElement = function rebuildByElement(id, el
 	for(let el of rest)
 		realDomTarget.insertAdjacentElement('afterend', el)
 
-	// replacing ="" and all space to compare in more real situation
-	// let cleaned = editorEl.outerHTML.replace(extraMeta, '').toLowerCase();
-	// let cleaned2 = newChangeInEl.replace(extraMeta, '').toLowerCase();
-	// if (cleaned != cleaned2)
-	//   return console.warn('breaking change');
-
 	let realDomTarget =
 		this.domHtml.querySelector(`[element_id="${this.target}"]`);
-
-
 
 	// todo: recognize html tag either by nesting rebuildDom or by itself as a selector as html is unique
 	this.rebuildDom(editorEl, realDomTarget)
@@ -647,7 +575,7 @@ domHtmlManipulator.prototype.rebuildByElement = function rebuildByElement(id, el
 
 }
 
-domHtmlManipulator.prototype.rebuildByDocument = function rebuildByDocument(id, elList, from) {
+function rebuildByDocument(id, elList, from) {
 
 	let editorEl = new DOMParser().parseFromString(this.html, "text/html");
 
@@ -655,7 +583,6 @@ domHtmlManipulator.prototype.rebuildByDocument = function rebuildByDocument(id, 
 	this.rebuildDom(editorEl.documentElement, this.domHtml)
 
 }
-
 
 
 function isTextOrEl(el) {
@@ -672,8 +599,6 @@ function elIndexOf(id, elList, from) {
 	}
 
 	return -1;
-	// Array.from(elList).some(el => el.getAttribute('element_id') == id)
-
 }
 
 function cloneByCreate(el) {
@@ -709,10 +634,6 @@ function textInsertAdajcentClone(target, element, position) {
 
 
 function insertAdajcentClone(target, element, position) {
-	// if (element.tagName === "SCRIPT")
-	//   target.insertAdjacentElement(position, cloneByCreate(element))
-	// else
-	//   target.insertAdjacentElement(position, element.cloneNode(true))
 
 	let cloned = element.cloneNode(true);
 	if(cloned.tagName === "SCRIPT")
@@ -726,7 +647,7 @@ function insertAdajcentClone(target, element, position) {
 
 // todo: optimize but not doing assignAttributes if the editorEl innerHtml changed
 // todo: optimize: skip after you canged rightDom as one single unit as changes to textArea happens in one place
-domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, flat) {
+function rebuildDom(leftEl, rightEl, flat) {
 
 
 	// if(rightEl.hasAttribute('contenteditable')) return;
@@ -853,7 +774,7 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, f
 					}
 					else {
 
-						this.rebuildDom.call(this, leftChild, rightChild, flat)
+						rebuildDom.call(this, leftChild, rightChild, flat)
 					}
 				}
 			}
@@ -870,17 +791,17 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, f
 
 }
 
-	function checkParent(element, selectors){
-	    let parentElement;
-	    do {
-		    if(element.parentElement.closest(selectors)) {
-	    		parentElement = element.parentElement.closest(selectors);
-		    } else {
-				return element;
-		    }
-		    element = parentElement;
-	    } while (parentElement);
-	}
+function checkParent(element, selectors){
+    let parentElement;
+    do {
+	    if(element.parentElement.closest(selectors)) {
+    		parentElement = element.parentElement.closest(selectors);
+	    } else {
+			return element;
+	    }
+	    element = parentElement;
+    } while (parentElement);
+}
 
 function renameTagName(leftEl, rightEl) {
 
@@ -914,9 +835,6 @@ function assignAttributes(leftEl, rightEl) {
 				rightEl.removeAttribute(rightAtt.name)
 				i--, len--;
 			}
-
-
-
 
 		}
 
