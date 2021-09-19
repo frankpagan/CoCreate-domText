@@ -399,32 +399,6 @@ function setInnerText({ domTextEl, target, value, start, end, avoidTextToDom, me
 }
 
 
-function getId(domTextEl, pos) {
-	let attWrapper = domTextEl.domTextHtml[pos];
-	let endWrapper = domTextEl.domTextHtml.indexOf(attWrapper, pos + 1);
-	return domTextEl.domTextHtml.substring(pos + 1, endWrapper);
-}
-
-function isPosOnEl(domTextEl, elementIdPos, pos) {
-
-	let target = getId(domTextEl, elementIdPos + idSearch.length);
-	if(!findStartTagById(domTextEl, target))
-		return false;
-
-	findClosingTag(domTextEl, target);
-	let tagStartPos = tagStPos;
-	let tagEndPos = tagEnClAfPos || tagStClAfPos;
-
-
-	if(pos > tagStartPos && pos < tagEndPos) {
-		return true;
-	}
-
-	// tofo: test performance efficiency more variable or more logic
-	// if (this.pos >= this.tagStClAfPos && this.pos <= this.tagEnClAfPos) {
-	//   return true;
-	// }
-}
 
 function parseAll(str) {
 	let mainTag = str.match(/\<(?<tag>[a-z0-9]+)(.*?)?\>/).groups.tag;
@@ -508,19 +482,46 @@ function findElByPos(domTextEl, pos) {
 
 
 	pos1 = domTextEl.domTextHtml.indexOf(idSearch, pos1 + idSearch.length);
-	if(pos1 !== -1 && isPosOnEl(domTextEl, idSearch, pos))
+	if(pos1 !== -1 && isPosOnEl(domTextEl, pos1, pos))
 		return true;
 
 	while(true) {
 		pos2 = domTextEl.domTextHtml.lastIndexOf(idSearch, pos2 - idSearch.length);
 
 		if(pos2 !== -1) {
-			if(isPosOnEl(domTextEl, idSearch, pos))
+			if(isPosOnEl(domTextEl, pos2, pos))
 				return true;
 		}
 		else return false;
 	}
 
+}
+
+function getId(domTextEl, pos) {
+	let attWrapper = domTextEl.domTextHtml[pos];
+	let endWrapper = domTextEl.domTextHtml.indexOf(attWrapper, pos + 1);
+	return domTextEl.domTextHtml.substring(pos + 1, endWrapper);
+}
+
+function isPosOnEl(domTextEl, elementIdPos, pos) {
+
+	let target = getId(domTextEl, elementIdPos + idSearch.length);
+	if(!findStartTagById(domTextEl, target))
+		return false;
+
+	findClosingTag(domTextEl, target);
+	let tagStartPos = tagStPos;
+	let tagEndPos = tagEnClAfPos || tagStClAfPos;
+
+
+	if(pos > tagStartPos && pos < tagEndPos) {
+		return true;
+	}
+
+	// tofo: test performance efficiency more variable or more logic
+	// if (this.pos >= this.tagStClAfPos && this.pos <= this.tagEnClAfPos) {
+	//   return true;
+	// }
 }
 
 function rebuildByElement(domTextEl, target) {
