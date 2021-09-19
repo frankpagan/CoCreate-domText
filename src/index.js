@@ -91,15 +91,16 @@ domHtmlManipulator.prototype.setCallback = function setCallback({ addCallback, r
 	this.removeCallback = function(param) {
 		if(!param)
 			return false;
-		textdomfr.set(param.from * param.to, true);
+		// if (param.type != 'innerText')
+			textdomfr.set(param.from * param.to, true);
 		this.html = this.html.removeAt(param.from, param.to);
 		removeCallback.call(null, param)
 	};
 	this.addCallback = function(param) {
 		if(!param)
 			return false;
-
-		textdomfa.set(param.position + param.value, true);
+		// if (param.type != 'innerText')
+			textdomfa.set(param.position + param.value, true);
 		this.html = this.html.replaceAt(param.position, param.value)
 		addCallback.call(null, param)
 	};
@@ -397,7 +398,7 @@ domHtmlManipulator.prototype.removeAttribute = function removeAttribute({ target
 };
 
 domHtmlManipulator.prototype.setInnerText = function setInnerText({ target, value, start, end, avoidTextToDom, metadata }) {
-	// let el = this.findElByPos(start)
+	let type = 'innerText';
 	// console.log('poos', el)
 	this.param.target = target;
 	this.reset();
@@ -410,21 +411,21 @@ domHtmlManipulator.prototype.setInnerText = function setInnerText({ target, valu
 	end = this.tagStClAfPos + end;
 
 	if(start != end) {
-		this.removeCallback({ start, end, avoidTextToDom, metadata });
+		this.removeCallback({ start, end, avoidTextToDom, metadata, type });
 	}
 	if(value == "Backspace" || value == "Tab" || value == "Enter") {
 		if(value == "Backspace" && start == end) {
-			this.removeCallback({ start: start - 1, end, avoidTextToDom, metadata });
+			this.removeCallback({ start: start - 1, end, avoidTextToDom, metadata, type });
 		}
 		if(value == 'Tab') {
-			this.addCallback({ position: start, value: "\t", avoidTextToDom, metadata });
+			this.addCallback({ position: start, value: "\t", avoidTextToDom, metadata, type });
 		}
 		if(value == "Enter") {
-			this.addCallback({ position: start, value: "\n", avoidTextToDom, metadata });
+			this.addCallback({ position: start, value: "\n", avoidTextToDom, metadata, type });
 		}
 	}
 	else {
-		this.addCallback({ position: start, value, avoidTextToDom, metadata });
+		this.addCallback({ position: start, value, avoidTextToDom, metadata, type });
 	}
 	return true;
 }
@@ -728,6 +729,11 @@ function insertAdajcentClone(target, element, position) {
 domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, flat) {
 
 
+	// if(rightEl.hasAttribute('contenteditable')) return;
+	// let parentCheck = checkParent(rightEl, 'contenteditable');
+	// if (parentCheck != rightEl) return;
+	
+	// if(rightEl.innerHTML == leftEl.innerHTML) return
 	if(rightEl.tagName && leftEl.tagName !== rightEl.tagName) {
 		renameTagName(leftEl, rightEl);
 
@@ -775,10 +781,12 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, f
 			let rightIsText = isTextOrEl(rightChild)
 			if(rightIsText === undefined)
 				continue;
+			if (rightEl.domText == true) continue;
 
 			if(leftIsText) {
 				if(rightIsText) {
 					if(leftChild.data.trim() !== rightChild.data.trim())
+						if (rightEl.domText == true) continue;
 						rightChild.data = leftChild.data;
 				}
 				else {
@@ -849,8 +857,6 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, f
 					}
 				}
 			}
-
-
 		}
 
 	}
@@ -864,7 +870,17 @@ domHtmlManipulator.prototype.rebuildDom = function rebuildDom(leftEl, rightEl, f
 
 }
 
-
+	function checkParent(element, selectors){
+	    let parentElement;
+	    do {
+		    if(element.parentElement.closest(selectors)) {
+	    		parentElement = element.parentElement.closest(selectors);
+		    } else {
+				return element;
+		    }
+		    element = parentElement;
+	    } while (parentElement);
+	}
 
 function renameTagName(leftEl, rightEl) {
 
