@@ -70,20 +70,20 @@ let atVEn;
 function removeCallback(param) {
 	if(!param) return;
 	let domTextEl = param.domTextEl;
-	let html = domTextEl.domTextHtml;
+	let html = domTextEl.htmlString;
 	// if (param.type != 'innerText')
 		textdomfr.set(param.from * param.to, true);
-	domTextEl.domTextHtml = removeAt(html, param.from, param.to);
+	domTextEl.htmlString = removeAt(html, param.from, param.to);
 	domTextEl.removeCallback.call(null, param);
 }
 
 function addCallback(param) {
 	if(!param) return;
 	let domTextEl = param.domTextEl;
-	let html = domTextEl.domTextHtml;
+	let html = domTextEl.htmlString;
 	// if (param.type != 'innerText')
 		textdomfa.set(param.position + param.value, true);
-	domTextEl.domTextHtml = replaceAt(html, param.position, param.value);
+	domTextEl.htmlString = replaceAt(html, param.position, param.value);
 	domTextEl.addCallback.call(null, param);
 }
 
@@ -98,7 +98,7 @@ function removeAt(html, index, to) {
 function findStartTagById(domTextEl, target) {
 	let sch = `(?:${sps}element_id\=\"${target}\"${sps})`;
 	let reg = `(?<tagWhole>${tgs}${at}*?${sch}${at}*?${the})`;
-	let tagStart = domTextEl.domTextHtml.match(new RegExp(reg, "is"));
+	let tagStart = domTextEl.htmlString.match(new RegExp(reg, "is"));
 
 	if(!tagStart)
 		throw new Error('element is not valid or can not be found');
@@ -131,7 +131,7 @@ function getWholeElement(domTextEl, target) {
 
 
 function findClosingTag(domTextEl, target) {
-	let match = domTextEl.domTextHtml.substr(tagStClAfPos)
+	let match = domTextEl.htmlString.substr(tagStClAfPos)
 		.matchAll(new RegExp(`(?<tagWhole>${getEndTag(tagName)}${at}*?${the})`, 'gi'));
 
 	if(!match) throw new Error('can not find any closing tag');
@@ -146,7 +146,6 @@ function findClosingTag(domTextEl, target) {
 				// let tagClosingNameStart = 1 + i.groups.isClosing.length + tagEnPos;
 				// let tagClosingNameEnd = tagClosingNameStart + tagName.length;
 				return true;
-
 			}
 			else
 				nest--;
@@ -155,6 +154,41 @@ function findClosingTag(domTextEl, target) {
 			nest++;
 	}
 	throw new Error('closing tag and openning tag order does not match');
+}
+
+function insertAdjacentElement({ domTextEl, target, position, element, elementValue }) {
+	let pos;
+	if(!elementValue) {
+		pos = getWholeElement(domTextEl, element);
+		if(!pos)
+			throw new Error('insertAdjacentElement: element not found');
+		elementValue = domTextEl.htmlString.substring(pos.start, pos.end);
+	}
+
+	findStartTagById(domTextEl, target);
+
+	let insertPos;
+	switch(position) {
+		case "beforebegin":
+			insertPos = tagStPos;
+			break;
+		case "afterbegin":
+			insertPos = tagStClAfPos;
+			break;
+		case "beforeend":
+			findClosingTag(domTextEl, target);
+			insertPos = tagEnPos;
+			break;		case "afterend":
+			findClosingTag(domTextEl, target);
+			insertPos = tagEnClAfPos;
+			break;
+	}
+	if(pos) {
+		if(pos.end < insertPos)
+			insertPos = insertPos - (pos.end - pos.start);
+		removeCallback({domTextEl, ...pos});
+	}
+	addCallback({ domTextEl, value: elementValue, position: insertPos });
 }
 
 function removeElement({ domTextEl, target }) {
@@ -172,40 +206,8 @@ function removeElement({ domTextEl, target }) {
 	}
 }
 
-function insertAdjacentElement({ domTextEl, target, position, element, elementValue }) {
-	let pos;
-	if(!elementValue) {
-		pos = getWholeElement(domTextEl, target);
-		if(!pos)
-			throw new Error('insertAdjacentElement: element not found');
-		elementValue = domTextEl.domTextHtml.substring(pos.start, pos.end);
-	}
-
-	findStartTagById(domTextEl, target);
-
-	let insertPos;
-	switch(position) {
-		case "beforebegin":
-		case "afterbegin":
-			insertPos = (position == 'beforebegin' ? tagStPos : tagStClAfPos);
-			break;
-		case "beforeend":
-		case "afterend":
-			findClosingTag(domTextEl, target);
-			insertPos = (position == 'beforeend' ? tagEnPos : tagEnClAfPos);
-			break;
-	}
-	if(pos) {
-		if(pos.end < insertPos)
-			insertPos = insertPos - (pos.end - pos.start);
-		removeCallback({domTextEl, ...pos});
-	}
-	addCallback({ domTextEl, value: elementValue, position: insertPos });
-}
-
-
 function setClass({ domTextEl, target, classname }) {
-	findAttribute( domTextEl, target, "class");
+	findAttributePos( domTextEl, target, "class");
 
 	if(atVEn) {
 		let positions = findClassPos( domTextEl, target, classname);
@@ -221,7 +223,7 @@ function setClass({ domTextEl, target, classname }) {
 }
 
 function setClassStyle({ domTextEl, target, classname, value, unit }) {
-	findAttribute(domTextEl, target, "class");
+	findAttributePos(domTextEl, target, "class");
 	let classnameStr = value ? ` ${classname}:${value+unit}` : ' ' + classname;
 	if(atVEn) {
 		let positions = findClassPos(domTextEl, classname);
@@ -239,7 +241,7 @@ function setClassStyle({ domTextEl, target, classname, value, unit }) {
 function findClassPos(domTextEl, classname, isStyle) {
 	let prRegClass = isStyle ? getRegClassStyle(classname) : getRegClass(classname);
 
-	let classStart = domTextEl.domTextHtml
+	let classStart = domTextEl.htmlString
 		.substring(atVSt, atVEn)
 		.match(
 			new RegExp(`(?<ourClass>${prRegClass})(?<classstyle>\:[^\"\ ]+)(\ |\")?`, "is")
@@ -258,7 +260,7 @@ function findClassPos(domTextEl, classname, isStyle) {
 }
 
 function setStyle({ domTextEl, target, styleName }) {
-	findAttribute(domTextEl, target, "style");
+	findAttributePos(domTextEl, target, "style");
 	if(atVSt === atVEn) return { start: atVSt, context: "value" };
 
 	else if(atVEn) {
@@ -277,7 +279,7 @@ function setStyle({ domTextEl, target, styleName }) {
 function findStylePos(domTextEl, target, style) {
 	let prRegStyle = getRegStyle(style);
 
-	let styleStart = domTextEl.domTextHtml
+	let styleStart = domTextEl.htmlString
 		.substring(atVSt, atVEn)
 		.match(
 			new RegExp(`^(?<styleWhole>${sty})*?(?<ourStyle>${prRegStyle})`, "is")
@@ -297,16 +299,28 @@ function findStylePos(domTextEl, target, style) {
 		};
 }
 
+function setAttribute({ domTextEl, target, name, value }) {
+	findAttributePos(domTextEl, target, name);
+	if(atEn)
+		removeCallback({ domTextEl, start: atSt, end: atEn });
+	if(value)
+		addCallback({ domTextEl, position: atSt, value: ` ${name}="${value}"` });
+}
 
-// findAttribute
-function findAttribute(domTextEl, target, property) {
+function removeAttribute({ domTextEl, target, name }) {
+	findAttributePos(domTextEl, target, name);
+	if(atEn)
+		removeCallback({ domTextEl, start: atSt, end: atEn });
+}
+
+function findAttributePos(domTextEl, target, property) {
 	if(!findStartTagById(domTextEl, target))
 		throw new Error('attribute can not be found');
 
 	let prRegAttr = getRegAttribute(property);
 	let regex = `^(?<beforeAtt>${at}*?)${prRegAttr}`;
 
-	let attStart = domTextEl.domTextHtml.substr(tagStAfPos).match(new RegExp(regex, "is"));
+	let attStart = domTextEl.htmlString.substr(tagStAfPos).match(new RegExp(regex, "is"));
 
 	if(attStart) {
 		atSt = tagStAfPos + attStart.groups.beforeAtt.length;
@@ -318,21 +332,6 @@ function findAttribute(domTextEl, target, property) {
 	else {
 		atSt = tagStClPos;
 	}
-}
-
-
-function setAttribute({ domTextEl, target, name, value }) {
-	findAttribute(domTextEl, target, name);
-	if(atEn)
-		removeCallback({ domTextEl, start: atSt, end: atEn });
-	if(value)
-		addCallback({ domTextEl, position: atSt, value: ` ${name}="${value}"` });
-}
-
-function removeAttribute({ domTextEl, target, name }) {
-	findAttribute(domTextEl, target, name);
-	if(atEn)
-		removeCallback({ domTextEl, start: atSt, end: atEn });
 }
 
 function setInnerText({ domTextEl, target, value, start, end, avoidTextToDom, metadata }) {
@@ -362,7 +361,6 @@ function setInnerText({ domTextEl, target, value, start, end, avoidTextToDom, me
 	else {
 		addCallback({ domTextEl, position: start, value, avoidTextToDom, metadata, type });
 	}
-	// return true;
 }
 
 function addToDom({ domTextEl, pos, changeStr }) {
@@ -376,7 +374,6 @@ function addToDom({ domTextEl, pos, changeStr }) {
 }
 
 function removeFromDom({ domTextEl, pos, removeLength }) {
-
 	let key = pos * (removeLength + pos);
 	if(textdomfr.has(key)) {
 		textdomfr.delete(key);
@@ -386,36 +383,26 @@ function removeFromDom({ domTextEl, pos, removeLength }) {
 	changeDom({ domTextEl, pos, removeLength });
 }
 
-function changeDom({ domTextEl, target, pos, changeStr, removeLength }) {
-	if(pos < 0 || pos > domTextEl.domTextHtml.length)
+function changeDom({ domTextEl, pos, changeStr, removeLength }) {
+	if(pos < 0 || pos > domTextEl.htmlString.length)
 		throw new Error('position is out of range');
 
 	changeStr = changeStr;
 	removeLength = removeLength;
 	pos = pos;
-
-	// try {
-
-		findElByPos(domTextEl, pos) ? rebuildByElement(domTextEl, target) : rebuildByDocument(domTextEl);
-
-	// }
-	// catch(err) {
-	// 	throw new Error("domText failed to apply the change " + err.message, err.name);
-	// }
-
-
+	findElByPos(domTextEl, pos) ? rebuildByElement(domTextEl, target) : rebuildByDocument(domTextEl);
 }
 
 function findElByPos(domTextEl, pos) {
 	let pos1 = pos - idSearch.length;
 	let pos2 = pos + idSearch.length;
 
-	pos1 = domTextEl.domTextHtml.indexOf(idSearch, pos1 + idSearch.length);
+	pos1 = domTextEl.htmlString.indexOf(idSearch, pos1 + idSearch.length);
 	if(pos1 !== -1 && isPosOnEl(domTextEl, pos1, pos))
 		return true;
 
 	while(true) {
-		pos2 = domTextEl.domTextHtml.lastIndexOf(idSearch, pos2 - idSearch.length);
+		pos2 = domTextEl.htmlString.lastIndexOf(idSearch, pos2 - idSearch.length);
 
 		if(pos2 !== -1) {
 			if(isPosOnEl(domTextEl, pos2, pos))
@@ -426,15 +413,9 @@ function findElByPos(domTextEl, pos) {
 
 }
 
-function getId(domTextEl, pos) {
-	let attWrapper = domTextEl.domTextHtml[pos];
-	let endWrapper = domTextEl.domTextHtml.indexOf(attWrapper, pos + 1);
-	return domTextEl.domTextHtml.substring(pos + 1, endWrapper);
-}
-
 function isPosOnEl(domTextEl, elementIdPos, pos) {
 	target = getId(domTextEl, elementIdPos + idSearch.length);
-	// if (target) return true; 
+
 	if(!findStartTagById(domTextEl, target))
 		return false;
 
@@ -442,163 +423,98 @@ function isPosOnEl(domTextEl, elementIdPos, pos) {
 	let tagStartPos = tagStPos;
 	let tagEndPos = tagEnClAfPos || tagStClAfPos;
 
-
 	if(pos > tagStartPos && pos < tagEndPos) {
 		return true;
 	}
-
-	// tofo: test performance efficiency more variable or more logic
-	// if (pos >= tagStClAfPos && pos <= tagEnClAfPos) {
-	//   return true;
-	// }
 }
+
+function getId(domTextEl, pos) {
+	let attWrapper = domTextEl.htmlString[pos];
+	let endWrapper = domTextEl.htmlString.indexOf(attWrapper, pos + 1);
+	return domTextEl.htmlString.substring(pos + 1, endWrapper);
+}
+
 
 function rebuildByElement(domTextEl) {
-	// let newChangeInEl = domTextEl.domTextHtml.substring(tagStPos, tagEnClAfPos || tagStClAfPos);
-	// if(!newChangeInEl) return;
-	// let [textEl, ...rest] = parseAll(newChangeInEl);
-	// let textEl = parseAll(newChangeInEl);
-	parseTextHtml(domTextEl);
-	let textEl = domTextEl.textHtml.querySelector(`[element_id="${target}"]`);
-	let prevTextEl = domTextEl.prevTextHtml.querySelector(`[element_id="${target}"]`);
+	parseHtml(domTextEl);
+	let newEl = domTextEl.newHtml.querySelector(`[element_id="${target}"]`);
+	let oldEl = domTextEl.oldHtml.querySelector(`[element_id="${target}"]`);
 	let domEl = domTextEl.querySelector(`[element_id="${target}"]`);
-	// for(let el of rest)
-	// 	domEl.insertAdjacentElement('afterend', el);
-
-	// todo: recognize html tag either by nesting rebuildDom or by itself as a selector as html is unique
-	rebuildDom(domTextEl, domEl, textEl, prevTextEl);
-}
-
-function parseAll(str) {
-	let mainTag = str.match(/\<(?<tag>[a-z0-9]+)(.*?)?\>/).groups.tag;
-	if(!mainTag)
-		throw new Error('find position: can not find the main tag');
-	let doc = new DOMParser().parseFromString(str, "text/html");
-	switch(mainTag) {
-		case 'html':
-			return [doc.documentElement];
-		case 'body':
-			return [doc.body];
-		case 'head':
-			return [doc.head];
-		default:
-			if(doc.head.children.length) return doc.head.children;
-			else return doc.body.children;
-	}
-
-}
-
-function parseTextHtml(domTextEl) {
-	var parser = new DOMParser();
-	var dom = parser.parseFromString(domTextEl.domTextHtml, "text/html");
-	if (domTextEl.textHtml) {
-		domTextEl.prevTextHtml = domTextEl.textHtml
-	} else {
-		domTextEl.prevTextHtml = dom
-	}
-	domTextEl.textHtml = dom;
+	rebuildDom(domTextEl, domEl, newEl, oldEl);
 }
 
 function rebuildByDocument(domTextEl) {
-	// let editorEl = new DOMParser().parseFromString(domTextEl.domTextHtml, "text/html");
-	rebuildDom(domTextEl, domTextEl, domTextEl.textHtml, domTextEl.prevTextHtml);
+	parseHtml(domTextEl);
+	rebuildDom(domTextEl, domTextEl, domTextEl.newHtml.documentElement, domTextEl.oldHtml.documentElement);
 }
 
-function rebuildDom(domTextEl, domEl, textEl, prevTextEl) {
-	// if(domEl.hasAttribute('contenteditable')) return;
-	// let parentCheck = checkParent(domEl, 'contenteditable');
-	// if (parentCheck != domEl) return;
-	
-	// if(domEl.innerHTML == textEl.innerHTML) return
-
-	if(domEl.tagName) {
-		if(textEl.tagName !== domEl.tagName) {
-			renameTagName(textEl, domEl);
-			return;
-		}	
-		if(domEl.tagName === "SCRIPT" && textEl.src !== domEl.src) {
-			domEl.replaceWith(cloneByCreate(textEl));
-			return;
-		}
-		// if(textEl.attributes !== prevTextEl.attributes) {
-		// 	assignAttributes(textEl, domEl);
-		// 	return;
-		// }
+function parseHtml(domTextEl) {
+	var parser = new DOMParser();
+	var dom = parser.parseFromString(domTextEl.htmlString, "text/html");
+	if (domTextEl.newHtml) {
+		domTextEl.oldHtml = domTextEl.newHtml
+	} else {
+		domTextEl.oldHtml = dom
 	}
+	domTextEl.newHtml = dom;
+}
 
-	const domElChildren = domEl.childNodes;
-	const textElChildren = Array.from(textEl.childNodes);
-
-	if(textEl.tagName === "HEAD" && !textElChildren.length) return;
-
-	let index = 0, len = textElChildren.length;
-	for(; index < len; index++) {
-		let textChild = textElChildren[index],
-			domChild = domElChildren[index];
-
-		let textElIsText = isTextOrEl(textChild);
-
-		if(!domChild) {
-			if(textElIsText === true)
-				domEl.insertAdjacentText('beforeend', textChild.data);
-			else if(textElIsText === false)
-				insertAdajcentClone(domEl, textChild, 'beforeend');
-			else continue;
+function rebuildDom(domTextEl, domEl, newEl, oldEl) {
+	// try{
+		if(domEl.tagName) {
+			if(newEl.tagName !== domEl.tagName) {
+				renameTagName(newEl, domEl);
+				return;
+			}	
+			if(domEl.tagName === "SCRIPT" && newEl.src !== domEl.src) {
+				domEl.replaceWith(cloneByCreate(newEl));
+				return;
+			}
+			if(oldEl) {
+				assignAttributes(newEl, oldEl, domEl);
+			}
 		}
-		else {
-			let domElIsText = isTextOrEl(domChild);
-			if(domElIsText === undefined) continue;
-			// if (domEl.domText == true) continue;
-
-			if(textElIsText) {
-				if(domElIsText) {
-					if(textChild.data.trim() !== domChild.data.trim())
-						// if (domEl.domText == true) continue;
-						domChild.data = textChild.data;
-				}
-				else {
-					domChild.before(document.createTextNode(textChild.data));
-					let domElId = domChild.getAttribute('element_id');
-
-					if(domElId) {
-						let elIndex = elIndexOf(domElId, domEl.childNodes);
-						if(elIndex === -1) {
-							domChild.remove();
-
-							mergeTextNode(domElChildren[index], domElChildren[index - 1]);
-							index--;
-							continue;
-						}
-						else if(domElChildren[elIndex] && domElChildren[elIndex] !== domChild)
-							domElChildren[elIndex].before(domChild);
-					}
-				}
+	
+		const domElChildren = domEl.childNodes;
+		const newElChildren = Array.from(newEl.childNodes);
+	
+		if(newEl.tagName === "HEAD" && !newElChildren.length) return;
+	
+		let index = 0, len = newElChildren.length;
+		for(; index < len; index++) {
+			let textChild = newElChildren[index],
+				domChild = domElChildren[index];
+			
+			if (domChild.nodeName === '#comment') continue;
+			let newElIsText = isTextOrEl(textChild);
+	
+			if(!domChild) {
+				if(newElIsText === true)
+					domEl.insertAdjacentText('beforeend', textChild.data);
+				else if(newElIsText === false)
+					insertAdajcentClone(domEl, textChild, 'beforeend');
+				else continue;
 			}
 			else {
-				if(domElIsText) {
-					textInsertAdajcentClone(domChild, textChild, 'beforebegin');
-					domChild.remove();
-				}
-				else {
-					let domElId = domChild.getAttribute('element_id');
-					let textElId = textChild.getAttribute('element_id');
-
-					if(textElId && domElId !== textElId) {
-						let elIndex = elIndexOf(textElId, domEl.childNodes);
-
-						if(elIndex === -1)
-							insertAdajcentClone(domChild, textChild, 'beforebegin');
-						else
-							domChild.insertAdjacentElement('beforebegin', domEl.childNodes[elIndex]);
-
-						// new element has been added we should process the new element again at index
-						domChild = domElChildren[index];
-						domElId = domChild.getAttribute('element_id');
+				let domElIsText = isTextOrEl(domChild);
+				if(domElIsText === undefined) continue;
+				// if (domEl.domText == true) continue;
+	
+				if(newElIsText) {
+					if(domElIsText) {
+						if(textChild.data.trim() !== domChild.data.trim())
+							// if (domEl.domText == true) continue;
+							domChild.data = textChild.data;
+					}
+					else {
+						domChild.before(document.createTextNode(textChild.data));
+						let domElId = domChild.getAttribute('element_id');
+	
 						if(domElId) {
-							elIndex = elIndexOf(domElId, domEl.childNodes);
-
+							let elIndex = elIndexOf(domElId, domEl.childNodes);
 							if(elIndex === -1) {
 								domChild.remove();
+	
 								mergeTextNode(domElChildren[index], domElChildren[index - 1]);
 								index--;
 								continue;
@@ -607,24 +523,63 @@ function rebuildDom(domTextEl, domEl, textEl, prevTextEl) {
 								domElChildren[elIndex].before(domChild);
 						}
 					}
+				}
+				else {
+					if(domElIsText) {
+						textInsertAdajcentClone(domChild, textChild, 'beforebegin');
+						domChild.remove();
+					}
 					else {
-						rebuildDom(domTextEl, domChild, textChild );
+						if (domChild.nodeName === '#comment') continue;
+						let domElId = domChild.getAttribute('element_id');
+						let newElId = textChild.getAttribute('element_id');
+	
+						if(newElId && domElId !== newElId) {
+							let elIndex = elIndexOf(newElId, domEl.childNodes);
+							if (!elIndex) continue;
+							if(elIndex === -1)
+								insertAdajcentClone(domChild, textChild, 'beforebegin');
+							else
+								domChild.insertAdjacentElement('beforebegin', domEl.childNodes[elIndex]);
+	
+							// new element has been added we should process the new element again at index
+							domChild = domElChildren[index];
+							domElId = domChild.getAttribute('element_id');
+							if(domElId) {
+								elIndex = elIndexOf(domElId, domEl.childNodes);
+	
+								if(elIndex === -1) {
+									domChild.remove();
+									mergeTextNode(domElChildren[index], domElChildren[index - 1]);
+									index--;
+									continue;
+								}
+								else if(domElChildren[elIndex] && domElChildren[elIndex] !== domChild)
+									domElChildren[elIndex].before(domChild);
+							}
+						}
+						else {
+							rebuildDom(domTextEl, domChild, textChild );
+						}
 					}
 				}
 			}
 		}
-	}
-
-	// remove rest of the child in the element
-	while(domElChildren[index]) {
-		domElChildren[index].remove();
-	}
+	
+		// remove rest of the child in the element
+		while(domElChildren[index]) {
+			domElChildren[index].remove();
+		}
+	// }
+	// catch(err) {
+	// 	throw new Error("domText failed to apply the change " + err.message, err.name);
+	// }
 }
 
 function cloneByCreate(el) {
 	let newEl = document.createElement(el.tagName);
 	newEl.innerHTML = el.innerHTML;
-	assignAttributes(el, newEl);
+	assignAttributes(el, newEl, newEl);
 	return newEl;
 }
 
@@ -640,11 +595,12 @@ function insertAdajcentClone(target, element, position) {
 }
 
 function textInsertAdajcentClone(target, element, position) {
+	if (element.nodeName === '#comment') return;
 	let func = position === "beforebegin" ? target.before : target.after;
 	let cloned = element.cloneNode(true);
 	if(cloned.tagName === "SCRIPT")
 		cloned = cloneByCreate(cloned);
-
+	if (cloned.nodeName === '#comment') return;
 	cloned.querySelectorAll('script').forEach(el => {
 		el.replaceWith(cloneByCreate(el));
 	});
@@ -665,52 +621,40 @@ function isTextOrEl(el) {
 		return false;
 }
 
-function elIndexOf(id, elList, from) {
+function elIndexOf(id, elList) {
 	for(let i = 0; i < elList.length; i++) {
+		if (elList[i].nodeName === '#comment') return;
 		if(isTextOrEl(elList[i]) === false && elList[i].getAttribute('element_id') == id)
 			return i;
 	}
-
 	return -1;
 }
 
-// function checkParent(element, selectors){
-//     let parentElement;
-//     do {
-// 	    if(element.parentElement.closest(selectors)) {
-//     		parentElement = element.parentElement.closest(selectors);
-// 	    } else {
-// 			return element;
-// 	    }
-// 	    element = parentElement;
-//     } while (parentElement);
-// }
 
-function renameTagName(textEl, domEl) {
-	let newDomEl = document.createElement(textEl.tagName);
-	assignAttributes(textEl, newDomEl);
-	newDomEl.replaceChildren(...textEl.childNodes);
+function renameTagName(newEl, domEl) {
+	let newDomEl = document.createElement(newEl.tagName);
+	assignAttributes(newEl, newDomEl, newDomEl);
+	newDomEl.replaceChildren(...newEl.childNodes);
 	domEl.replaceWith(newDomEl);
 }
 
 // overwrite except element_id
-function assignAttributes(textEl, domEl) {
-	for(let textElAtt of textEl.attributes) {
-		if(!domEl.attributes[textElAtt.name] || domEl.attributes[textElAtt.name].value !== textElAtt.value)
+function assignAttributes(newEl, oldEl, domEl) {
+	for(let newElAtt of newEl.attributes) {
+		if(!oldEl.attributes[newElAtt.name] || oldEl.attributes[newElAtt.name].value !== newElAtt.value)
 			try {
-				domEl.setAttribute(textElAtt.name, textElAtt.value);
+				domEl.setAttribute(newElAtt.name, newElAtt.value);
 			}
 		catch(err) {
-			// <st is valid based on w3 but setAttribute throw exception
-			// https://www.w3.org/TR/2011/WD-html5-20110525/syntax.html#attributes-0
+			throw new Error("assignAttributes: " + err.message, err.name);
 		}
 	}
 
-	if(textEl.attributes.length !== domEl.attributes.length) {
-		for(let i = 0, len = domEl.attributes.length; i < len; i++) {
-			let domElAtt = domEl.attributes[i];
-			if(!textEl.attributes[domElAtt.name]) {
-				domEl.removeAttribute(domElAtt.name);
+	if(newEl.attributes.length !== oldEl.attributes.length) {
+		for(let i = 0, len = oldEl.attributes.length; i < len; i++) {
+			let oldElAtt = oldEl.attributes[i];
+			if(!newEl.attributes[oldElAtt.name]) {
+				domEl.removeAttribute(oldElAtt.name);
 				i--, len--;
 			}
 
