@@ -69,22 +69,22 @@ let atVEn;
 	
 function removeCallback(param) {
 	if(!param) return;
-	let domTextEl = param.domTextEl;
-	let html = domTextEl.htmlString;
+	let domTextEditor = param.domTextEditor;
+	let html = domTextEditor.htmlString;
 	// if (param.type != 'innerText')
 		textdomfr.set(param.from * param.to, true);
-	domTextEl.htmlString = removeAt(html, param.from, param.to);
-	domTextEl.removeCallback.call(null, param);
+	domTextEditor.htmlString = removeAt(html, param.from, param.to);
+	domTextEditor.removeCallback.call(null, param);
 }
 
 function addCallback(param) {
 	if(!param) return;
-	let domTextEl = param.domTextEl;
-	let html = domTextEl.htmlString;
+	let domTextEditor = param.domTextEditor;
+	let html = domTextEditor.htmlString;
 	// if (param.type != 'innerText')
 		textdomfa.set(param.position + param.value, true);
-	domTextEl.htmlString = replaceAt(html, param.position, param.value);
-	domTextEl.addCallback.call(null, param);
+	domTextEditor.htmlString = replaceAt(html, param.position, param.value);
+	domTextEditor.addCallback.call(null, param);
 }
 
 function replaceAt(html, index, replacement) {
@@ -95,10 +95,10 @@ function removeAt(html, index, to) {
 	return html.substr(0, index) + html.substr(to);
 }
 
-function findStartTagById(domTextEl, target) {
+function findStartTagById(domTextEditor, target) {
 	let sch = `(?:${sps}element_id\=\"${target}\"${sps})`;
 	let reg = `(?<tagWhole>${tgs}${at}*?${sch}${at}*?${the})`;
-	let tagStart = domTextEl.htmlString.match(new RegExp(reg, "is"));
+	let tagStart = domTextEditor.htmlString.match(new RegExp(reg, "is"));
 
 	if(!tagStart)
 		throw new Error('element is not valid or can not be found');
@@ -120,9 +120,9 @@ function findStartTagById(domTextEl, target) {
 	return true;
 }
 
-function getWholeElement(domTextEl, target) {
-	if(findStartTagById(domTextEl, target)) {
-		findClosingTag(domTextEl, target);
+function getWholeElement(domTextEditor, target) {
+	if(findStartTagById(domTextEditor, target)) {
+		findClosingTag(domTextEditor, target);
 		return { start: tagStPos, end: tagEnClAfPos || tagStClAfPos };
 	}
 	else
@@ -130,8 +130,8 @@ function getWholeElement(domTextEl, target) {
 }
 
 
-function findClosingTag(domTextEl, target) {
-	let match = domTextEl.htmlString.substr(tagStClAfPos)
+function findClosingTag(domTextEditor, target) {
+	let match = domTextEditor.htmlString.substr(tagStClAfPos)
 		.matchAll(new RegExp(`(?<tagWhole>${getEndTag(tagName)}${at}*?${the})`, 'gi'));
 
 	if(!match) throw new Error('can not find any closing tag');
@@ -156,16 +156,16 @@ function findClosingTag(domTextEl, target) {
 	throw new Error('closing tag and openning tag order does not match');
 }
 
-function insertAdjacentElement({ domTextEl, target, position, element, elementValue }) {
+function insertAdjacentElement({ domTextEditor, target, position, element, elementValue }) {
 	let pos;
 	if(!elementValue) {
-		pos = getWholeElement(domTextEl, element);
+		pos = getWholeElement(domTextEditor, element);
 		if(!pos)
 			throw new Error('insertAdjacentElement: element not found');
-		elementValue = domTextEl.htmlString.substring(pos.start, pos.end);
+		elementValue = domTextEditor.htmlString.substring(pos.start, pos.end);
 	}
 
-	findStartTagById(domTextEl, target);
+	findStartTagById(domTextEditor, target);
 
 	let insertPos;
 	switch(position) {
@@ -176,72 +176,72 @@ function insertAdjacentElement({ domTextEl, target, position, element, elementVa
 			insertPos = tagStClAfPos;
 			break;
 		case "beforeend":
-			findClosingTag(domTextEl, target);
+			findClosingTag(domTextEditor, target);
 			insertPos = tagEnPos;
 			break;		case "afterend":
-			findClosingTag(domTextEl, target);
+			findClosingTag(domTextEditor, target);
 			insertPos = tagEnClAfPos;
 			break;
 	}
 	if(pos) {
 		if(pos.end < insertPos)
 			insertPos = insertPos - (pos.end - pos.start);
-		removeCallback({domTextEl, ...pos});
+		removeCallback({domTextEditor, ...pos});
 	}
-	addCallback({ domTextEl, value: elementValue, position: insertPos });
+	addCallback({ domTextEditor, value: elementValue, position: insertPos });
 }
 
-function removeElement({ domTextEl, target }) {
-	let pos = getWholeElement(domTextEl, target);
+function removeElement({ domTextEditor, target }) {
+	let pos = getWholeElement(domTextEditor, target);
 	if(!pos)
 		throw new Error('removeElement: element not found');
 
-	findStartTagById(domTextEl, target);
+	findStartTagById(domTextEditor, target);
 
 	let insertPos;
 	if(pos) {
 		if(pos.end < insertPos)
 			insertPos = insertPos - (pos.end - pos.start);
-		removeCallback({domTextEl, ...pos});
+		removeCallback({domTextEditor, ...pos});
 	}
 }
 
-function setClass({ domTextEl, target, classname }) {
-	findAttributePos( domTextEl, target, "class");
+function setClass({ domTextEditor, target, classname }) {
+	findAttributePos( domTextEditor, target, "class");
 
 	if(atVEn) {
-		let positions = findClassPos( domTextEl, target, classname);
+		let positions = findClassPos( domTextEditor, target, classname);
 		if(positions.end)
-			removeCallback({domTextEl, ...positions});
+			removeCallback({domTextEditor, ...positions});
 
-		addCallback({ domTextEl, position: positions.start, value: classname });
+		addCallback({ domTextEditor, position: positions.start, value: classname });
 	}
 	else {
-		addCallback({ domTextEl, position: atSt, value: ` class="${classname}"` });
+		addCallback({ domTextEditor, position: atSt, value: ` class="${classname}"` });
 	}
 
 }
 
-function setClassStyle({ domTextEl, target, classname, value, unit }) {
-	findAttributePos(domTextEl, target, "class");
+function setClassStyle({ domTextEditor, target, classname, value, unit }) {
+	findAttributePos(domTextEditor, target, "class");
 	let classnameStr = value ? ` ${classname}:${value+unit}` : ' ' + classname;
 	if(atVEn) {
-		let positions = findClassPos(domTextEl, classname);
+		let positions = findClassPos(domTextEditor, classname);
 		if(positions.end)
-			removeCallback({domTextEl, ...positions});
+			removeCallback({domTextEditor, ...positions});
 		if(value)
-			addCallback({ domTextEl, position: positions.start, value: classnameStr });
+			addCallback({ domTextEditor, position: positions.start, value: classnameStr });
 	}
 	else if(value) {
-		addCallback({ domTextEl, position: atSt, value: ` class="${classnameStr}"` });
+		addCallback({ domTextEditor, position: atSt, value: ` class="${classnameStr}"` });
 	}
 
 }
 
-function findClassPos(domTextEl, classname, isStyle) {
+function findClassPos(domTextEditor, classname, isStyle) {
 	let prRegClass = isStyle ? getRegClassStyle(classname) : getRegClass(classname);
 
-	let classStart = domTextEl.htmlString
+	let classStart = domTextEditor.htmlString
 		.substring(atVSt, atVEn)
 		.match(
 			new RegExp(`(?<ourClass>${prRegClass})(?<classstyle>\:[^\"\ ]+)(\ |\")?`, "is")
@@ -259,27 +259,27 @@ function findClassPos(domTextEl, classname, isStyle) {
 		return { start: atVEn };
 }
 
-function setStyle({ domTextEl, target, styleName }) {
-	findAttributePos(domTextEl, target, "style");
+function setStyle({ domTextEditor, target, styleName }) {
+	findAttributePos(domTextEditor, target, "style");
 	if(atVSt === atVEn) return { start: atVSt, context: "value" };
 
 	else if(atVEn) {
-		let positions = findStylePos(domTextEl, target, styleName);
+		let positions = findStylePos(domTextEditor, target, styleName);
 		if(positions.end)
-			removeCallback({domTextEl, ...positions});
+			removeCallback({domTextEditor, ...positions});
 
-		addCallback({ domTextEl, position: positions.start, value: styleName });
+		addCallback({ domTextEditor, position: positions.start, value: styleName });
 	}
 	else {
 		// attribute styleName not exist
-		addCallback({ domTextEl, position: atSt, value: ` style="${styleName}"` });
+		addCallback({ domTextEditor, position: atSt, value: ` style="${styleName}"` });
 	}
 }
 
-function findStylePos(domTextEl, target, style) {
+function findStylePos(domTextEditor, target, style) {
 	let prRegStyle = getRegStyle(style);
 
-	let styleStart = domTextEl.htmlString
+	let styleStart = domTextEditor.htmlString
 		.substring(atVSt, atVEn)
 		.match(
 			new RegExp(`^(?<styleWhole>${sty})*?(?<ourStyle>${prRegStyle})`, "is")
@@ -299,28 +299,28 @@ function findStylePos(domTextEl, target, style) {
 		};
 }
 
-function setAttribute({ domTextEl, target, name, value }) {
-	findAttributePos(domTextEl, target, name);
+function setAttribute({ domTextEditor, target, name, value }) {
+	findAttributePos(domTextEditor, target, name);
 	if(atEn)
-		removeCallback({ domTextEl, start: atSt, end: atEn });
+		removeCallback({ domTextEditor, start: atSt, end: atEn });
 	if(value)
-		addCallback({ domTextEl, position: atSt, value: ` ${name}="${value}"` });
+		addCallback({ domTextEditor, position: atSt, value: ` ${name}="${value}"` });
 }
 
-function removeAttribute({ domTextEl, target, name }) {
-	findAttributePos(domTextEl, target, name);
+function removeAttribute({ domTextEditor, target, name }) {
+	findAttributePos(domTextEditor, target, name);
 	if(atEn)
-		removeCallback({ domTextEl, start: atSt, end: atEn });
+		removeCallback({ domTextEditor, start: atSt, end: atEn });
 }
 
-function findAttributePos(domTextEl, target, property) {
-	if(!findStartTagById(domTextEl, target))
+function findAttributePos(domTextEditor, target, property) {
+	if(!findStartTagById(domTextEditor, target))
 		throw new Error('attribute can not be found');
 
 	let prRegAttr = getRegAttribute(property);
 	let regex = `^(?<beforeAtt>${at}*?)${prRegAttr}`;
 
-	let attStart = domTextEl.htmlString.substr(tagStAfPos).match(new RegExp(regex, "is"));
+	let attStart = domTextEditor.htmlString.substr(tagStAfPos).match(new RegExp(regex, "is"));
 
 	if(attStart) {
 		atSt = tagStAfPos + attStart.groups.beforeAtt.length;
@@ -334,78 +334,78 @@ function findAttributePos(domTextEl, target, property) {
 	}
 }
 
-function setInnerText({ domTextEl, target, value, start, end, avoidTextToDom, metadata }) {
+function setInnerText({ domTextEditor, target, value, start, end, avoidTextToDom, metadata }) {
 	let type = 'innerText';
 
-	if(findStartTagById(domTextEl, target))
-		findClosingTag(domTextEl, target);
+	if(findStartTagById(domTextEditor, target))
+		findClosingTag(domTextEditor, target);
 	else return;
 
 	start = tagStClAfPos + start;
 	end = tagStClAfPos + end;
 
 	if(start != end) {
-		removeCallback({ domTextEl, start, end, avoidTextToDom, metadata, type });
+		removeCallback({ domTextEditor, start, end, avoidTextToDom, metadata, type });
 	}
 	if(value == "Backspace" || value == "Tab" || value == "Enter") {
 		if(value == "Backspace" && start == end) {
-			removeCallback({ domTextEl, start: start - 1, end, avoidTextToDom, metadata, type });
+			removeCallback({ domTextEditor, start: start - 1, end, avoidTextToDom, metadata, type });
 		}
 		if(value == 'Tab') {
-			addCallback({ domTextEl, position: start, value: "\t", avoidTextToDom, metadata, type });
+			addCallback({ domTextEditor, position: start, value: "\t", avoidTextToDom, metadata, type });
 		}
 		if(value == "Enter") {
-			addCallback({ domTextEl, position: start, value: "\n", avoidTextToDom, metadata, type });
+			addCallback({ domTextEditor, position: start, value: "\n", avoidTextToDom, metadata, type });
 		}
 	}
 	else {
-		addCallback({ domTextEl, position: start, value, avoidTextToDom, metadata, type });
+		addCallback({ domTextEditor, position: start, value, avoidTextToDom, metadata, type });
 	}
 }
 
-function addToDom({ domTextEl, pos, changeStr }) {
+function addToDom({ domTextEditor, pos, changeStr }) {
 	let key = pos + changeStr;
 	if(textdomfa.has(key)) {
 		textdomfa.delete(key);
 		return;
 
 	}
-	changeDom({ domTextEl, pos, changeStr });
+	changeDom({ domTextEditor, pos, changeStr });
 }
 
-function removeFromDom({ domTextEl, pos, removeLength }) {
+function removeFromDom({ domTextEditor, pos, removeLength }) {
 	let key = pos * (removeLength + pos);
 	if(textdomfr.has(key)) {
 		textdomfr.delete(key);
 		return;
 
 	}
-	changeDom({ domTextEl, pos, removeLength });
+	changeDom({ domTextEditor, pos, removeLength });
 }
 
-function changeDom({ domTextEl, pos, changeStr, removeLength }) {
-	if(pos < 0 || pos > domTextEl.htmlString.length)
+function changeDom({ domTextEditor, pos, changeStr, removeLength }) {
+	if(pos < 0 || pos > domTextEditor.htmlString.length)
 		throw new Error('position is out of range');
 
 	changeStr = changeStr;
 	removeLength = removeLength;
 	pos = pos;
-	findElByPos(domTextEl, pos) ? rebuildByElement(domTextEl, target) : rebuildByDocument(domTextEl);
+	findElByPos(domTextEditor, pos) ? rebuildByElement(domTextEditor, target) : rebuildByDocument(domTextEditor);
 }
 
-function findElByPos(domTextEl, pos) {
+function findElByPos(domTextEditor, pos) {
 	let pos1 = pos - idSearch.length;
 	let pos2 = pos + idSearch.length;
 
-	pos1 = domTextEl.htmlString.indexOf(idSearch, pos1 + idSearch.length);
-	if(pos1 !== -1 && isPosOnEl(domTextEl, pos1, pos))
+	pos1 = domTextEditor.htmlString.indexOf(idSearch, pos1 + idSearch.length);
+	if(pos1 !== -1 && isPosOnEl(domTextEditor, pos1, pos))
 		return true;
 
 	while(true) {
-		pos2 = domTextEl.htmlString.lastIndexOf(idSearch, pos2 - idSearch.length);
+		pos2 = domTextEditor.htmlString.lastIndexOf(idSearch, pos2 - idSearch.length);
 
 		if(pos2 !== -1) {
-			if(isPosOnEl(domTextEl, pos2, pos))
+			if(isPosOnEl(domTextEditor, pos2, pos))
 				return true;
 		}
 		else return false;
@@ -413,13 +413,13 @@ function findElByPos(domTextEl, pos) {
 
 }
 
-function isPosOnEl(domTextEl, elementIdPos, pos) {
-	target = getId(domTextEl, elementIdPos + idSearch.length);
+function isPosOnEl(domTextEditor, elementIdPos, pos) {
+	target = getId(domTextEditor, elementIdPos + idSearch.length);
 
-	if(!findStartTagById(domTextEl, target))
+	if(!findStartTagById(domTextEditor, target))
 		return false;
 
-	findClosingTag(domTextEl, target);
+	findClosingTag(domTextEditor, target);
 	let tagStartPos = tagStPos;
 	let tagEndPos = tagEnClAfPos || tagStClAfPos;
 
@@ -428,40 +428,68 @@ function isPosOnEl(domTextEl, elementIdPos, pos) {
 	}
 }
 
-function getId(domTextEl, pos) {
-	let attWrapper = domTextEl.htmlString[pos];
-	let endWrapper = domTextEl.htmlString.indexOf(attWrapper, pos + 1);
-	return domTextEl.htmlString.substring(pos + 1, endWrapper);
+function getId(domTextEditor, pos) {
+	let attWrapper = domTextEditor.htmlString[pos];
+	let endWrapper = domTextEditor.htmlString.indexOf(attWrapper, pos + 1);
+	return domTextEditor.htmlString.substring(pos + 1, endWrapper);
 }
 
 
-function rebuildByElement(domTextEl) {
-	parseHtml(domTextEl);
-	let newEl = domTextEl.newHtml.querySelector(`[element_id="${target}"]`);
-	let oldEl = domTextEl.oldHtml.querySelector(`[element_id="${target}"]`);
-	let domEl = domTextEl.querySelector(`[element_id="${target}"]`);
-	rebuildDom(domTextEl, domEl, newEl, oldEl);
+function rebuildByElement(domTextEditor) {
+	parseHtml(domTextEditor);
+	let newEl = domTextEditor.newHtml.querySelector(`[element_id="${target}"]`);
+	let oldEl = domTextEditor.oldHtml.querySelector(`[element_id="${target}"]`);
+	let domEl = domTextEditor.querySelector(`[element_id="${target}"]`);
+	rebuildDom(domTextEditor, domEl, newEl, oldEl);
 }
 
-function rebuildByDocument(domTextEl) {
-	parseHtml(domTextEl);
-	rebuildDom(domTextEl, domTextEl, domTextEl.newHtml.documentElement, domTextEl.oldHtml.documentElement);
-}
-
-function parseHtml(domTextEl) {
-	var parser = new DOMParser();
-	var dom = parser.parseFromString(domTextEl.htmlString, "text/html");
-	if (domTextEl.newHtml) {
-		domTextEl.oldHtml = domTextEl.newHtml
-	} else {
-		domTextEl.oldHtml = dom
+function rebuildByDocument(domTextEditor) {
+	parseHtml(domTextEditor);
+	if (domTextEditor.newHtml.documentElement) {
+		rebuildDom(domTextEditor, domTextEditor, domTextEditor.newHtml.documentElement, domTextEditor.oldHtml.documentElement);
 	}
-	domTextEl.newHtml = dom;
+	else
+		rebuildDom(domTextEditor, domTextEditor, domTextEditor.newHtml, domTextEditor.oldHtml);
+
 }
 
-function rebuildDom(domTextEl, domEl, newEl, oldEl) {
+function parseHtml(domTextEditor) {
+	// var parser = new DOMParser();
+	// var dom = parser.parseFromString(domTextEditor.htmlString, "text/html");
+	var dom = parseAll(domTextEditor.htmlString);
+	if (domTextEditor.newHtml) {
+		domTextEditor.oldHtml = domTextEditor.newHtml
+	} else {
+		domTextEditor.oldHtml = dom
+	}
+	domTextEditor.newHtml = dom;
+}
+
+function parseAll(str) {
+	let mainTag;
+	try {
+		mainTag = str.match(/\<(?<tag>[a-z0-9]+)(.*?)?\>/).groups.tag;
+	} 
+	finally {
+		let doc = new DOMParser().parseFromString(str, "text/html");
+		switch(mainTag) {
+			case 'html':
+				return doc.documentElement;
+			case 'body':
+				return doc.body;
+			case 'head':
+				return doc.head;
+	
+			default:
+				if(doc.head.children.length) return doc.head.children;
+				else return doc.body.childNodes;
+		}
+	}
+}
+
+function rebuildDom(domTextEditor, domEl, newEl, oldEl) {
 	// try{
-		if(domEl.tagName) {
+		if(domEl.tagName && newEl.nodeType == 1) {
 			if(newEl.tagName !== domEl.tagName) {
 				renameTagName(newEl, domEl);
 				return;
@@ -476,7 +504,10 @@ function rebuildDom(domTextEl, domEl, newEl, oldEl) {
 		}
 	
 		const domElChildren = domEl.childNodes;
-		const newElChildren = Array.from(newEl.childNodes);
+		let newElChildren;
+		if(newEl.nodeType == 1) {
+			newElChildren = Array.from(newEl.childNodes);
+		} else {newElChildren = newEl;}
 	
 		if(newEl.tagName === "HEAD" && !newElChildren.length) return;
 	
@@ -485,7 +516,7 @@ function rebuildDom(domTextEl, domEl, newEl, oldEl) {
 			let textChild = newElChildren[index],
 				domChild = domElChildren[index];
 			
-			if (domChild.nodeName === '#comment') continue;
+			// if (domChild.nodeName === '#comment') continue;
 			let newElIsText = isTextOrEl(textChild);
 	
 			if(!domChild) {
@@ -559,7 +590,7 @@ function rebuildDom(domTextEl, domEl, newEl, oldEl) {
 							}
 						}
 						else {
-							rebuildDom(domTextEl, domChild, textChild );
+							rebuildDom(domTextEditor, domChild, textChild );
 						}
 					}
 				}
