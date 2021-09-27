@@ -336,7 +336,7 @@ function findAttributePos(domTextEditor, target, property) {
 
 function setInnerText({ domTextEditor, target, value, start, end, avoidTextToDom, metadata }) {
 	let type = 'innerText';
-
+	target = target.getAttribute('element_id');
 	if(findStartTagById(domTextEditor, target))
 		findClosingTag(domTextEditor, target);
 	else return;
@@ -363,34 +363,41 @@ function setInnerText({ domTextEditor, target, value, start, end, avoidTextToDom
 	}
 }
 
-function addToDom({ domTextEditor, pos, changeStr }) {
-	let key = pos + changeStr;
+function replaceInnerText({ domTextEditor, target, value }) {
+	target = target.getAttribute('element_id');
+	if(findStartTagById(domTextEditor, target))
+		findClosingTag(domTextEditor, target);
+	else return;
+
+  removeCallback({ domTextEditor, start: tagStClAfPos, end: tagEnPos });
+  addCallback({ domTextEditor, position: tagStClAfPos, value });
+}
+
+
+function addToDom({ domTextEditor, start, value }) {
+	let key = start + value;
 	if(textdomfa.has(key)) {
 		textdomfa.delete(key);
 		return;
 
 	}
-	changeDom({ domTextEditor, pos, changeStr });
+	changeDom({ domTextEditor, start, value });
 }
 
-function removeFromDom({ domTextEditor, pos, removeLength }) {
-	let key = pos * (removeLength + pos);
+function removeFromDom({ domTextEditor, start, removeLength }) {
+	let key = start * (removeLength + start);
 	if(textdomfr.has(key)) {
 		textdomfr.delete(key);
 		return;
 
 	}
-	changeDom({ domTextEditor, pos, removeLength });
+	changeDom({ domTextEditor, start, removeLength });
 }
 
-function changeDom({ domTextEditor, pos, changeStr, removeLength }) {
-	if(pos < 0 || pos > domTextEditor.htmlString.length)
+function changeDom({ domTextEditor, start, value}) {
+	if(start < 0 || start > domTextEditor.htmlString.length)
 		throw new Error('position is out of range');
-
-	changeStr = changeStr;
-	removeLength = removeLength;
-	pos = pos;
-	findElByPos(domTextEditor, pos) ? rebuildByElement(domTextEditor, target) : rebuildByDocument(domTextEditor);
+	findElByPos(domTextEditor, start) ? rebuildByElement(domTextEditor, target) : rebuildByDocument(domTextEditor);
 }
 
 function findElByPos(domTextEditor, pos) {
@@ -694,4 +701,4 @@ function assignAttributes(newEl, oldEl, domEl) {
 	}
 }
 
-export default {insertAdjacentElement, removeElement, setInnerText, setAttribute, removeAttribute, setClass, setStyle, setClassStyle, addToDom, removeFromDom};
+export default {insertAdjacentElement, removeElement, setInnerText, setAttribute, removeAttribute, setClass, setStyle, setClassStyle, addToDom, removeFromDom, changeDom, replaceInnerText};
