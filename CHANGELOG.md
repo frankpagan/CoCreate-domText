@@ -1,3 +1,16 @@
+# [1.4.0](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.3.3...v1.4.0) (2021-09-27)
+
+
+### Bug Fixes
+
+* getId ([b3d7162](https://github.com/CoCreate-app/CoCreate-domText/commit/b3d71625e78352c68843efcd661cc2abd07ad08a))
+* insertAjacentElement ([5dc2587](https://github.com/CoCreate-app/CoCreate-domText/commit/5dc258760c4610ca8b2c4e0388299a4218222545))
+
+
+### Features
+
+* works for both dom and content editble. supports string or html ([8dcf110](https://github.com/CoCreate-app/CoCreate-domText/commit/8dcf110bc734501ec300e8ab491e2b43b48a75ee))
+
 ## [1.3.3](https://github.com/CoCreate-app/CoCreate-domText/compare/v1.3.2...v1.3.3) (2021-09-18)
 
 
